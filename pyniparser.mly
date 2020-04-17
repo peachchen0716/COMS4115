@@ -8,7 +8,9 @@ open Ast
 /* left right quotation mark, def */
 %token LQUOTE RQUOTE DEF
 %token EQ NEQ LT GT AND OR
-%token IF ELSE WHILE FOR INT BOOL
+/* Right now, no need to support FOR because we don't have definition for list yet */
+%token FOR */
+%token IF ELSE WHILE INT BOOL
 /* return, COMMA token */
 %token RETURN COMMA
 %token <int> LITERAL
@@ -69,13 +71,15 @@ stmt_list:
 
 stmt:
     expr SEMI                               { Expr $1 }
-    /* (int i = 0; i < 10; i++) */
+    /* (int i = 0; i < 10; i++) 
     | LPAREN stmt_list RPAREN               { Block $2 }
+    */
     | LBRACE stmt_list RBRACE               { Block $2 }
     | IF LPAREN expr RPAREN stmt ELSE stmt  {If ($3, $5, $7) }
     | WHILE LPAREN expr RPAREN stmt         { While ($3, $5) }
-    /* for (int i = 0; i < 10; i++) {} */
+    /* for (int i = 0; i < 10; i++) {} 
     | FOR LPAREN stmt_list RPAREN stmt      { For ($3, $5) }
+    */
     | RETURN expr SEMI                      {Return $2}
 
 expr:

@@ -17,7 +17,6 @@ type stmt =
     | Expr of expr
     | If of expr * stmt * stmt
     | While of expr * stmt
-    | For of stmt * stmt
     | Return of expr
 
 type bind = typ * string
