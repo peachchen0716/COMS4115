@@ -71,15 +71,9 @@ stmt_list:
 
 stmt:
     expr SEMI                               { Expr $1 }
-    /* (int i = 0; i < 10; i++) 
-    | LPAREN stmt_list RPAREN               { Block $2 }
-    */
     | LBRACE stmt_list RBRACE               { Block $2 }
     | IF LPAREN expr RPAREN stmt ELSE stmt  {If ($3, $5, $7) }
     | WHILE LPAREN expr RPAREN stmt         { While ($3, $5) }
-    /* for (int i = 0; i < 10; i++) {} 
-    | FOR LPAREN stmt_list RPAREN stmt      { For ($3, $5) }
-    */
     | RETURN expr SEMI                      {Return $2}
 
 expr:
