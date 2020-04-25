@@ -36,7 +36,7 @@ program:
 
 decls:
     { ([], []) }
-    | stmt SEMI decls { (($1 :: fst $3), snd $3) }
+    | stmt decls { (($1 :: fst $2), snd $2) }
     | fdecl decls { (fst $2, ($1 :: snd $2)) }
 
 typ:
@@ -91,7 +91,7 @@ expr:
     | expr AND    expr { Binop($1, And,   $3)   }
     | expr OR     expr { Binop($1, Or,    $3)   }
     | ID ASSIGN expr   { Assign($1, $3)         }
-    | typ ID ASSIGN expr { BindAssign(($1, $2), Assign($2, $4)) }
+    | typ ID ASSIGN expr { BindAssign($1, $2, $4) }
     | LPAREN expr RPAREN { $2                   }
     | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
 
