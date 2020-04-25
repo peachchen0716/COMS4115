@@ -1,7 +1,7 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
-        | GreaterEq | LessEq
+        | GreaterEq | LessEq | Incre | Decre 
 
 type typ = Int | Bool | Float | List of typ
 
@@ -13,6 +13,7 @@ type expr =
   | Flit of float
   | Id of string
   | ListLit of expr list
+  | Uniop of expr * op
   | Binop of expr * op * expr
   | Assign of string * expr
   | BindAssign of typ * string * expr 
@@ -47,6 +48,8 @@ let string_of_op = function
   | GreaterEq -> ">="
   | And -> "&&"
   | Or -> "||"
+  | Incre -> "++"
+  | Decre -> "--"
                                                      
 let rec string_of_typ = function
     Int -> "int"
@@ -64,6 +67,7 @@ let rec string_of_expr = function
   | ListLit(hd :: tl) -> string_of_expr hd ^ " " ^  string_of_expr (ListLit(tl))
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
+  | Uniop(e, o) -> string_of_expr e ^ " " ^ string_of_op o
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | BindAssign(t, v, e) -> string_of_typ t ^ " " ^ v ^ " = " ^
                            string_of_expr e 

@@ -19,7 +19,6 @@ rule token = parse
 | ','      { COMMA }
 | '+'      { PLUS }
 | '-'      { MINUS }
-(* increment & decrement *)
 | "++"     { INCRE }
 | "--"     { DECRE }
 (* mod *)
