@@ -5,11 +5,11 @@ open Ast
 %}
 
 %token SEMI COLON LPAREN RPAREN LBRACE RBRACE PLUS MINUS TIMES DIVIDE ASSIGN
-/* left right quotation mark, def */
-%token LQUOTE RQUOTE DEF
+/* quotation mark, def */
+%token QUOTE DEF
 %token EQ NEQ LT GT AND OR
 /* Right now, no need to support FOR because we don't have definition for list yet */
-%token FOR */
+/* %token FOR */
 %token IF ELSE WHILE INT BOOL
 /* return, COMMA token */
 %token RETURN COMMA
@@ -47,10 +47,10 @@ fdecl:
     DEF ID LPAREN formals_opt RPAREN COLON typ LBRACE stmt_list RBRACE
     {
         {
-            rtyp=$6;
+            rtyp=$7;
             fname=$2;
             formals=$4;
-            body=$8;
+            body=$9;
         }
     }
 
@@ -97,6 +97,7 @@ expr:
     | expr AND    expr { Binop($1, And,   $3)   }
     | expr OR     expr { Binop($1, Or,    $3)   }
     | ID ASSIGN expr   { Assign($1, $3)         }
+    | typ ID ASSIGN expr { BindAssign(($1, $2), Assign($2, $4)) }
     | LPAREN expr RPAREN { $2                   }
     | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
 

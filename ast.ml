@@ -4,12 +4,15 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
 
 type typ = Int | Bool 
 
+type bind = typ * string
+
 type expr =
     Literal of int
     | BoolLit of bool
     | Id of string
     | Binop of expr * op * expr
     | Assign of string * expr
+    | BindAssign of bind * expr
     | Call of string * expr list
 
 type stmt = 
@@ -18,8 +21,6 @@ type stmt =
     | If of expr * stmt * stmt
     | While of expr * stmt
     | Return of expr
-
-type bind = typ * string
 
 type func_def = {
     rtyp: typ;

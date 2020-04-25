@@ -1,6 +1,6 @@
-(* Ocamllex scanner for MicroC *)
+(* Ocamllex scanner for Pyni *)
 
-{ open Microcparse }
+{ open Pyniparser }
 
 let digit = ['0'-'9']
 let letter = ['a'-'z' 'A'-'Z']
@@ -28,7 +28,6 @@ rule token = parse
 | '>'      { GT }
 | "&&"     { AND }
 | "||"     { OR }
-| "for"    {FOR}
 | "if"     { IF }
 | "else"   { ELSE }
 | "while"  { WHILE }
