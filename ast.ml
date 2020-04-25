@@ -1,27 +1,29 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
+        | GreaterEq | LessEq
 
-type typ = Int | Bool | Float
+type typ = Int | Bool | Float | List of typ
 
 type bind = typ * string
 
 type expr =
     Literal of int
-    | BoolLit of bool
-    | Flit of float
-    | Id of string
-    | Binop of expr * op * expr
-    | Assign of string * expr
-    | BindAssign of typ * string * expr 
-    | Call of string * expr list
+  | BoolLit of bool
+  | Flit of float
+  | Id of string
+  | ListLit of expr list
+  | Binop of expr * op * expr
+  | Assign of string * expr
+  | BindAssign of typ * string * expr 
+  | Call of string * expr list
 
 type stmt = 
     Block of stmt list
-    | Expr of expr
-    | If of expr * stmt * stmt
-    | While of expr * stmt
-    | Return of expr
+  | Expr of expr
+  | If of expr * stmt * stmt
+  | While of expr * stmt
+  | Return of expr
 
 type func_def = {
     rtyp: typ;
@@ -41,13 +43,16 @@ let string_of_op = function
   | Neq -> "!="
   | Less -> "<"
   | Greater -> ">" 
+  | LessEq -> "<="
+  | GreaterEq -> ">="
   | And -> "&&"
   | Or -> "||"
                                                      
-let string_of_typ = function
+let rec string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
   | Float -> "float"
+  | List(t) -> "list " ^ string_of_typ t
  
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
@@ -55,6 +60,8 @@ let rec string_of_expr = function
   | BoolLit(false) -> "false"
   | Flit(f) -> string_of_float f
   | Id(s) -> s
+  | ListLit([]) -> ""
+  | ListLit(hd :: tl) -> string_of_expr hd ^ " " ^  string_of_expr (ListLit(tl))
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e

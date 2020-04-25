@@ -12,7 +12,6 @@ rule token = parse
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
-(* left right square bracket *)
 | '['      { LSQUA }
 | ']'      { RSQUA }
 | ';'      { SEMI }
@@ -36,7 +35,6 @@ rule token = parse
 | '!'      { NOT }
 | '<'      { LT }
 | '>'      { GT }
-(* LTE & GTE *)
 | "<="     { LTE }
 | ">="     { GTE }
 | "&&"     { AND }
@@ -52,7 +50,6 @@ rule token = parse
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
 | "float"  { FLOAT }
-(* list *)
 | "list"   { LIST }
 | digit+ as lem  { LITERAL(int_of_string lem) }
 | digit+ '.' digit* as f { FLIT(float_of_string f) }

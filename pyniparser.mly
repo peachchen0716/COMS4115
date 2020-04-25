@@ -44,9 +44,10 @@ decls:
     | fdecl decls { (fst $2, ($1 :: snd $2)) }
 
 typ:
-    INT { Int }
-    | BOOL { Bool }
-    | FLOAT { Float }
+    INT             { Int }
+  | BOOL            { Bool }
+  | FLOAT           { Float }
+  | LIST LT typ GT  { List($3) }
 
 fdecl:
     DEF ID LPAREN formals_opt RPAREN COLON typ LBRACE stmt_list RBRACE
@@ -94,10 +95,13 @@ expr:
     | expr NEQ    expr { Binop($1, Neq, $3)     }
     | expr LT     expr { Binop($1, Less,  $3)   }
     | expr GT     expr { Binop($1, Greater, $3) }
+    | expr LTE    expr { Binop($1, LessEq,  $3) }
+    | expr GTE    expr { Binop($1, GreaterEq, $3) }
     | expr AND    expr { Binop($1, And,   $3)   }
     | expr OR     expr { Binop($1, Or,    $3)   }
     | ID ASSIGN expr   { Assign($1, $3)         }
     | typ ID ASSIGN expr { BindAssign($1, $2, $4) }
+    | LSQUA args_opt RSQUA { ListLit($2) }
     | LPAREN expr RPAREN { $2                   }
     | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
 
