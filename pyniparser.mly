@@ -76,11 +76,17 @@ stmt_list:
     | stmt stmt_list { $1::$2 }
 
 stmt:
-    expr SEMI                               { Expr $1 }
+    expr SEMI                             { Expr $1 }
   | LBRACE stmt_list RBRACE               { Block $2 }
-  | IF LPAREN expr RPAREN stmt ELSE stmt  {If ($3, $5, $7) }
+  | IF LPAREN expr RPAREN stmt ELSE stmt  { If ($3, $5, $7) }
   | WHILE LPAREN expr RPAREN stmt         { While ($3, $5) }
-  | RETURN expr SEMI                      {Return $2}
+  | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt      
+                                          { For ($3, $5, $7, $9) }
+  | RETURN expr SEMI                      { Return $2 }
+
+expr_opt:
+    /* nothing */ { Noexpr }
+  | expr          { $1 }
 
 expr:
     LITERAL          { Literal($1)            }

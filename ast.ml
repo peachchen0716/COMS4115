@@ -18,12 +18,14 @@ type expr =
   | Assign of string * expr
   | BindAssign of typ * string * expr 
   | Call of string * expr list
+  | Noexpr
 
 type stmt = 
     Block of stmt list
   | Expr of expr
   | If of expr * stmt * stmt
   | While of expr * stmt
+  | For of expr * expr * expr * stmt
   | Return of expr
 
 type func_def = {
@@ -73,6 +75,7 @@ let rec string_of_expr = function
                            string_of_expr e 
   | Call(f, el) ->
     f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Noexpr -> " "
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -82,6 +85,10 @@ let rec string_of_stmt = function
   | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
                       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
+  | For(e1, e2, e3, s) -> "For ( " ^ string_of_expr e1 ^ "; " ^
+                          string_of_expr e2 ^ "; " ^ 
+                          string_of_expr e3 ^ ")\n" ^
+                          string_of_stmt s
                                                             
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
                                                                
