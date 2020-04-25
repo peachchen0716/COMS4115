@@ -5,29 +5,33 @@ open Ast
 %}
 
 %token SEMI COLON LPAREN RPAREN LBRACE RBRACE PLUS MINUS TIMES DIVIDE ASSIGN
+%token LSQUA RSQUA INCRE DECRE MOD
 /* quotation mark, def */
 %token QUOTE DEF
-%token EQ NEQ LT GT AND OR
+%token EQ NEQ LT GT LTE GTE AND OR NOT
 /* Right now, no need to support FOR because we don't have definition for list yet */
-/* %token FOR */
-%token IF ELSE WHILE INT BOOL
+%token FOR 
+%token IF ELSE WHILE INT BOOL FLOAT
 /* return, COMMA token */
 %token RETURN COMMA
 %token <int> LITERAL
 %token <bool> BLIT
+%token <float> FLIT
 %token <string> ID
+%token LIST
 %token EOF
 
 %start program
 %type <Ast.program> program
 
+%left INCRE DECRE
 %right ASSIGN
 %left OR
 %left AND
 %left EQ NEQ
 %left LT GT
 %left PLUS MINUS
-%left TIMES DIVIDE
+%left TIMES DIVIDE MOD
 
 %%
 
@@ -42,6 +46,7 @@ decls:
 typ:
     INT { Int }
     | BOOL { Bool }
+    | FLOAT { Float }
 
 fdecl:
     DEF ID LPAREN formals_opt RPAREN COLON typ LBRACE stmt_list RBRACE
@@ -79,6 +84,7 @@ stmt:
 expr:
       LITERAL          { Literal($1)            }
     | BLIT             { BoolLit($1)            }
+    | FLIT             { Flit($1)               }
     | ID               { Id($1)                 }
     | expr PLUS   expr { Binop($1, Add,   $3)   }
     | expr MINUS  expr { Binop($1, Sub,   $3)   }

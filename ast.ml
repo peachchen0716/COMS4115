@@ -2,13 +2,14 @@
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
 
-type typ = Int | Bool 
+type typ = Int | Bool | Float
 
 type bind = typ * string
 
 type expr =
     Literal of int
     | BoolLit of bool
+    | Flit of float
     | Id of string
     | Binop of expr * op * expr
     | Assign of string * expr
@@ -46,11 +47,13 @@ let string_of_op = function
 let string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
+  | Float -> "float"
  
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
+  | Flit(f) -> string_of_float f
   | Id(s) -> s
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
