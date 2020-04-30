@@ -18,6 +18,7 @@ rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
 (* Comments *)
 | '#'      { comment lexbuf }
+| "\"\"\"" { multcomment lexbuf }
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
@@ -72,3 +73,7 @@ rule token = parse
 and comment = parse
   "\n" { token lexbuf }
 | _    { comment lexbuf }
+
+and multcomment = parse
+  "\"\"\""  { token lexbuf }
+  | _         { multcomment lexbuf }
