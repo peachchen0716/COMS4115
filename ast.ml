@@ -63,7 +63,7 @@ let rec string_of_expr = function
     Literal(l) -> string_of_int l
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
-  | Flit(f) -> string_of_float f
+  | FLit(f) -> string_of_float f
   | Id(s) -> s
   | ListLit([]) -> ""
   | ListLit(hd :: tl) -> string_of_expr hd ^ " " ^  string_of_expr (ListLit(tl))
