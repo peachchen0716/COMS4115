@@ -72,7 +72,30 @@ let translate (globals, functionc) =
 		| SFLit f -> L.const_float float_t f
 		| SListLit l -> (* TODO: list expr *)
 		| SUniop (e, op) -> 
-		  let e1 = build_expr builder e in
+			let e' = build_expr builder e 
+			and one = L.const_int i32_t 1 in
+			(match op with 
+		  		A.Incre -> L.build_add
+		  	  | A.Decre -> L.build_sub
+		  	) e' one "uniop" builder
+		| SBniop (e1, op, e2) ->
+			let e1' = build_expr builder e1 
+			and e2' = build_expr builder e2 in
+			(match op with 
+				(* arithematic operator for Int *)
+				  A.Add when e1'.lltype = i32_t && e2'.lltype = i32_t -> L.build_add 
+				| A.Sub when e1'.lltype = i32_t && e2'.lltype = i32_t -> L.build_sub
+				| A.Mult when e1'.lltype = i32_t && e2'.lltype = i32_t -> L.build_mul
+				| A.Div when e1'.lltype = i32_t && e2'.lltype = i32_t -> L.build_
+				| A.Equal
+				| A.Neq
+				| A.Less
+				| A.Greater
+				| A.And 
+				| A.Or
+				| A.GreateEq
+				| A.LessEq -> 
+			)
 		  
 
 
