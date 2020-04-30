@@ -10,7 +10,7 @@ type bind = typ * string
 type expr =
     Literal of int
   | BoolLit of bool
-  | Flit of float
+  | FLit of float
   | Id of string
   | ListLit of expr list
   | Uniop of expr * op

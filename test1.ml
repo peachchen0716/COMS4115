@@ -1,3 +1,4 @@
+(* test case for parser *)
 open Ast
 
 let _ =

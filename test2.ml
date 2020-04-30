@@ -1,3 +1,4 @@
+(* test case for semantic checking *)
 open Sast
 
 let _ =
