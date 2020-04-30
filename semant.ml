@@ -92,7 +92,17 @@ let check (globals, functions) =
                   string_of_typ rt ^ " in " ^ string_of_expr ex
         in
         (check_assign lt rt err, SAssign(var, (rt, e')))
-
+      | Uniop(e, op) ->
+        let (t, e') = check expr e in
+        let err = "illegal uniary operation " ^ string_of_typ t ^ " " ^
+                  string_of_op op
+        in 
+        if t = Int then 
+          let rt = match op with
+              Incre when t = Int -> Int
+            | Decre when t = Int -> Int 
+            | _ -> raise (Failure err)
+        else raise (Failure err)
       | Binop(e1, op, e2) as e ->
         let (t1, e1') = check_expr e1
         and (t2, e2') = check_expr e2 in
