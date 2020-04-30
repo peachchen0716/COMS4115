@@ -11,12 +11,13 @@ open Ast
 %token EQ NEQ LT GT LTE GTE AND OR NOT
 /* Right now, no need to support FOR because we don't have definition for list yet */
 %token FOR 
-%token IF ELSE WHILE INT BOOL FLOAT
+%token IF ELSE WHILE INT BOOL FLOAT STRING
 /* return, COMMA token */
 %token RETURN COMMA
 %token <int> LITERAL
 %token <bool> BLIT
 %token <float> FLIT
+%token <string> STRLIT
 %token <string> ID
 %token LIST
 %token EOF
@@ -47,6 +48,7 @@ typ:
     INT             { Int }
   | BOOL            { Bool }
   | FLOAT           { Float }
+  | STRING          { String }
   | LIST LT typ GT  { List($3) }
 
 fdecl:
@@ -92,6 +94,7 @@ expr:
     LITERAL          { Literal($1)            }
   | BLIT             { BoolLit($1)            }
   | FLIT             { FLit($1)               }
+  | STRLIT           { StrLit($1)             }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }

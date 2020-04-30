@@ -1,13 +1,23 @@
 (* Ocamllex scanner for Pyni *)
 
-{ open Pyniparser }
+{
+  open Pyniparser 
+
+  let strip_quotes s = 
+    match String.length s with
+  | 0 | 1 | 2 -> ""
+  | l -> String.sub s 1 (l - 2)
+}
 
 let digit = ['0'-'9']
 let letter = ['a'-'z' 'A'-'Z']
+(* match string that doesn't contain quotation or non escaped character *)
+let stringlit = ('"' ([^'\\''"'] | '\\'_)* '"')
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
-| "/*"     { comment lexbuf }           (* Comments *)
+(* Comments *)
+| '#'      { comment lexbuf }
 | '('      { LPAREN }
 | ')'      { RPAREN }
 | '{'      { LBRACE }
@@ -46,17 +56,19 @@ rule token = parse
 | "return" { RETURN }
 | "int"    { INT }
 | "bool"   { BOOL }
-| "true"   { BLIT(true)  }
-| "false"  { BLIT(false) }
+| "True"   { BLIT(true)  }
+| "False"  { BLIT(false) }
 | "float"  { FLOAT }
+| "str"    { STRING }
 | "list"   { LIST }
 | digit+ as lem  { LITERAL(int_of_string lem) }
 | digit+ '.' digit* as f { FLIT(float_of_string f) }
 | digit* '.' digit+ as f { FLIT(float_of_string f) }
 | letter (digit | letter | '_')* as lem { ID(lem) }
+| stringlit as lem { STRLIT(strip_quotes lem) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
 and comment = parse
-  "*/" { token lexbuf }
+  "\n" { token lexbuf }
 | _    { comment lexbuf }

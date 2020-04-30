@@ -3,7 +3,7 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
         | GreaterEq | LessEq | Incre | Decre 
 
-type typ = Int | Bool | Float | List of typ
+type typ = Int | Bool | Float | String | List of typ
 
 type bind = typ * string
 
@@ -11,6 +11,7 @@ type expr =
     Literal of int
   | BoolLit of bool
   | FLit of float
+  | StrLit of string
   | Id of string
   | ListLit of expr list
   | Uniop of expr * op
@@ -57,6 +58,7 @@ let rec string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
   | Float -> "float"
+  | String -> "string"
   | List(t) -> "list " ^ string_of_typ t
  
 let rec string_of_expr = function
@@ -64,6 +66,7 @@ let rec string_of_expr = function
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | FLit(f) -> string_of_float f
+  | StrLit(s) -> s
   | Id(s) -> s
   | ListLit([]) -> ""
   | ListLit(hd :: tl) -> string_of_expr hd ^ " " ^  string_of_expr (ListLit(tl))
