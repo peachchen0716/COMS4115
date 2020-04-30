@@ -31,6 +31,7 @@ open Ast
 %left AND
 %left EQ NEQ
 %left LT GT
+%left LTE GTE
 %left PLUS MINUS
 %left TIMES DIVIDE MOD
 
@@ -104,8 +105,8 @@ expr:
   | expr NEQ    expr { Binop($1, Neq, $3)     }
   | expr LT     expr { Binop($1, Less,  $3)   }
   | expr GT     expr { Binop($1, Greater, $3) }
-  | expr LTE    expr { Binop($1, LessEq,  $3) }
-  | expr GTE    expr { Binop($1, GreaterEq, $3) }
+  | expr LTE    expr { Binop($1, LessEq,  $3) } 
+  | expr GTE    expr { Binop($1, GreaterEq, $3) } 
   | expr AND    expr { Binop($1, And,   $3)   }
   | expr OR     expr { Binop($1, Or,    $3)   }
   | expr INCRE       { Uniop($1, Incre)       }
