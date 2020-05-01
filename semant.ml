@@ -11,7 +11,10 @@ module StringMap = Map.Make(String)
    Check each global variable, then check each function *)
 
 (* parse locals varibale declared in the function brackets*)
-let locals = [] in
+let locals = 
+match func.body with
+  [] -> []
+| hd :: tl -> 
 
 let check (globals, functions) =
 
