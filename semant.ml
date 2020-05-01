@@ -10,6 +10,9 @@ module StringMap = Map.Make(String)
 
    Check each global variable, then check each function *)
 
+(* parse locals varibale declared in the function brackets*)
+let locals = [] in
+
 let check (globals, functions) =
 
   (* Verify a list of bindings has no duplicate names *)
@@ -31,7 +34,7 @@ let check (globals, functions) =
       rtyp = Int;
       fname = "print";
       formals = [(Int, "x")];
-      locals = []; body = [] } StringMap.empty
+      (* locals = []; *) body = [] } StringMap.empty
   in
 
   (* Add function name to symbol table *)
@@ -92,17 +95,6 @@ let check (globals, functions) =
                   string_of_typ rt ^ " in " ^ string_of_expr ex
         in
         (check_assign lt rt err, SAssign(var, (rt, e')))
-      | Uniop(e, op) ->
-        let (t, e') = check expr e in
-        let err = "illegal uniary operation " ^ string_of_typ t ^ " " ^
-                  string_of_op op
-        in 
-        if t = Int then 
-          let rt = match op with
-              Incre when t = Int -> Int
-            | Decre when t = Int -> Int 
-            | _ -> raise (Failure err)
-        else raise (Failure err)
       | Binop(e1, op, e2) as e ->
         let (t1, e1') = check_expr e1
         and (t2, e2') = check_expr e2 in
@@ -147,6 +139,7 @@ let check (globals, functions) =
 
     let rec check_stmt_list =function
         [] -> []
+      (*optimization, not necessary*)
       | Block sl :: sl'  -> check_stmt_list (sl @ sl') (* Flatten blocks *)
       | s :: sl -> check_stmt s :: check_stmt_list sl
     (* Return a semantically-checked statement i.e. containing sexprs *)

@@ -32,6 +32,7 @@ type stmt =
 type func_def = {
     rtyp: typ;
     fname: string;
+    (* locals: bind list; *)
     formals: bind list;
     body: stmt list;
 }
