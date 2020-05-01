@@ -85,7 +85,7 @@ stmt:
   | WHILE LPAREN expr RPAREN stmt         { While ($3, $5) }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt      
                                           { For ($3, $5, $7, $9) }
-  | typ ID                                { Decl ($1, $2)}
+  | typ ID ASSIGN expr SEMI               { BindAssign($1, $2, $4) }
   | RETURN expr SEMI                      { Return $2 }
 
 expr_opt:
@@ -113,7 +113,6 @@ expr:
   | expr INCRE       { Uniop($1, Incre)       }
   | expr DECRE       { Uniop($1, Decre)       }
   | ID ASSIGN expr   { Assign($1, $3)         }
-  | typ ID ASSIGN expr { BindAssign($1, $2, $4) }
   | LSQUA args_opt RSQUA { ListLit($2) }
   | LPAREN expr RPAREN { $2                   }
   | ID LPAREN args_opt RPAREN { Call ($1, $3)  }

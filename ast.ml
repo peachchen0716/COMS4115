@@ -17,7 +17,6 @@ type expr =
   | Uniop of expr * op
   | Binop of expr * op * expr
   | Assign of string * expr
-  | BindAssign of typ * string * expr 
   | Call of string * expr list
   | Noexpr
 
@@ -27,13 +26,12 @@ type stmt =
   | If of expr * stmt * stmt
   | While of expr * stmt
   | For of expr * expr * expr * stmt
-  | Decl of typ * string
+  | BindAssign of typ * string * expr 
   | Return of expr
 
 type func_def = {
     rtyp: typ;
     fname: string;
-    (* locals: bind list; *)
     formals: bind list;
     body: stmt list;
 }
@@ -76,8 +74,6 @@ let rec string_of_expr = function
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Uniop(e, o) -> string_of_expr e ^ " " ^ string_of_op o
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
-  | BindAssign(t, v, e) -> string_of_typ t ^ " " ^ v ^ " = " ^
-                           string_of_expr e 
   | Call(f, el) ->
     f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> " "
@@ -94,6 +90,8 @@ let rec string_of_stmt = function
                           string_of_expr e2 ^ "; " ^ 
                           string_of_expr e3 ^ ")\n" ^
                           string_of_stmt s
+  | BindAssign(t, v, e) -> string_of_typ t ^ " " ^ v ^ " = " ^
+                           string_of_expr e 
                                                             
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
                                                                
