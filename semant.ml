@@ -11,10 +11,12 @@ module StringMap = Map.Make(String)
    Check each global variable, then check each function *)
 
 (* parse locals varibale declared in the function brackets*)
-let locals = 
-match func.body with
+let rec locals body = 
+match body with
   [] -> []
-| hd :: tl -> 
+| hd :: tl -> match hd with 
+| Decl (t, s) -> (t, s) :: (locals tl)
+| _ ->  locals tl
 
 let check (globals, functions) =
 
@@ -67,7 +69,7 @@ let check (globals, functions) =
   let check_func func =
     (* Make sure no formals or locals are void or duplicates *)
     check_binds "formal" func.formals;
-    check_binds "local" func.locals;
+    check_binds "local" (locals func.body);
 
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
@@ -77,7 +79,7 @@ let check (globals, functions) =
 
     (* Build local symbol table of variables for this function *)
     let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
-        StringMap.empty (globals @ func.formals @ func.locals )
+        StringMap.empty (globals @ func.formals @ locals func.body )
     in
 
     (* Return a variable from our local symbol table *)
@@ -165,7 +167,6 @@ let check (globals, functions) =
     { srtyp = func.rtyp;
       sfname = func.fname;
       sformals = func.formals;
-      slocals  = func.locals;
       sbody = check_stmt_list func.body
     }
   in

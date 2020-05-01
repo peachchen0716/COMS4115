@@ -27,6 +27,7 @@ type stmt =
   | If of expr * stmt * stmt
   | While of expr * stmt
   | For of expr * expr * expr * stmt
+  | Decl of typ * string
   | Return of expr
 
 type func_def = {
