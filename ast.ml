@@ -3,7 +3,7 @@
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
         | GreaterEq | LessEq | Incre | Decre 
 
-type typ = Int | Bool | Float | String | List of typ
+type typ = Int | Bool | Float | String | None | List of typ
 
 type bind = typ * string
 
@@ -18,6 +18,7 @@ type expr =
   | Binop of expr * op * expr
   | Assign of string * expr
   | Call of string * expr list
+  (* Noexpr is used within a for loop to make for (;a < 10;) valid *)
   | Noexpr
 
 type stmt = 
@@ -59,6 +60,7 @@ let rec string_of_typ = function
   | Bool -> "bool"
   | Float -> "float"
   | String -> "string"
+  | None -> "None"
   | List(t) -> "list " ^ string_of_typ t
  
 let rec string_of_expr = function

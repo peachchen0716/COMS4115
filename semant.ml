@@ -9,15 +9,6 @@ module StringMap = Map.Make(String)
    throws an exception if something is wrong.
 
    Check each global variable, then check each function *)
-
-(* parse locals varibale declared in the function brackets*)
-let rec locals body = 
-match body with
-  [] -> []
-| hd :: tl -> match hd with 
-| Decl (t, s) -> (t, s) :: (locals tl)
-| _ ->  locals tl
-
 let check (globals, functions) =
 
   (* Verify a list of bindings has no duplicate names *)
@@ -39,7 +30,7 @@ let check (globals, functions) =
       rtyp = Int;
       fname = "print";
       formals = [(Int, "x")];
-      (* locals = []; *) body = [] } StringMap.empty
+      body = [] } StringMap.empty
   in
 
   (* Add function name to symbol table *)
@@ -66,10 +57,18 @@ let check (globals, functions) =
 
   let _ = find_func "main" in (* Ensure "main" is defined *)
 
+  (* Pyni parse locals varibale declared in the function body*)
+  let rec get_locals body = match body with
+    [] -> []
+  | hd :: tl -> match hd with 
+      BindAssign(t, s, e) -> (t, s) :: (get_locals tl)
+    | _ ->  get_locals tl
+  in
+
   let check_func func =
     (* Make sure no formals or locals are void or duplicates *)
     check_binds "formal" func.formals;
-    check_binds "local" (locals func.body);
+    check_binds "local" (get_locals func.body);
 
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
@@ -87,12 +86,31 @@ let check (globals, functions) =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
+    
+    (* Pyni Return a sementically checked list and the type of its elements 
+     * raise an error if element types are inconsistent*) 
+    let rec check_list lst =
+        [] -> (None, [])
+      | hd :: tl -> 
+      let (t1, e1) = check_expr hd
+      and (t2, e2) = check_list tl in
+      let err = "illegal list of type " ^ string_of_typ t1 ^ 
+                " with type " ^ "" 
+      in 
+      if t2 = None || t1 = t2 then (t1, e1 :: e2)
+      else raise (Failure err)
+    in
 
     (* Return a semantically-checked expression, i.e., with a type *)
     let rec check_expr = function
         Literal l -> (Int, SLiteral l)
       | BoolLit l -> (Bool, SBoolLit l)
+      | FLit l -> (Float, SFLit l)
+      | StrLit l -> (String, SStrLit l)
       | Id var -> (type_of_identifier var, SId var)
+      | ListLit lst -> let (t, slst) = check_list lst
+          in 
+          (t, SListLit(t, slst))
       | Assign(var, e) as ex ->
         let lt = type_of_identifier var
         and (rt, e') = check_expr e in
@@ -100,6 +118,20 @@ let check (globals, functions) =
                   string_of_typ rt ^ " in " ^ string_of_expr ex
         in
         (check_assign lt rt err, SAssign(var, (rt, e')))
+      | Uniop(e, op)-> 
+        let (t, e') = check_expr e in
+        let err = "illegal uniary operation " ^ string_of_typ t ^ " " ^
+                  string_of_op op
+        in 
+        (* TODO: for now only int can have uniop, !boolean should also be allowed in the future *)
+        if t = Int then 
+          let rt = match op with
+              Incre when t = Int -> Int
+            | Decre when t = Int -> Int
+            | _ -> raise (Failure err)
+          in 
+          (t, SUniop((t, e'), op))
+        else raise (Failure err)
       | Binop(e1, op, e2) as e ->
         let (t1, e1') = check_expr e1
         and (t2, e2') = check_expr e2 in
@@ -133,6 +165,7 @@ let check (globals, functions) =
           in
           let args' = List.map2 check_call fd.formals args
           in (fd.rtyp, SCall(fname, args'))
+      | Noexpr -> SNoexpr
     in
 
     let check_bool_expr e =
@@ -142,7 +175,7 @@ let check (globals, functions) =
       |  _ -> raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
     in
 
-    let rec check_stmt_list =function
+    let rec check_stmt_list = function
         [] -> []
       (*optimization, not necessary*)
       | Block sl :: sl'  -> check_stmt_list (sl @ sl') (* Flatten blocks *)
@@ -157,6 +190,14 @@ let check (globals, functions) =
         SIf(check_bool_expr e, check_stmt st1, check_stmt st2)
       | While(e, st) ->
         SWhile(check_bool_expr e, check_stmt st)
+      | For(s1, s2, s3, st) ->
+        let (t2, s2') = check_stmt s2 in
+        if t2 = Bool then SFor(check_stmt s1, check_stmt s2, check_stmt s3, check_stmt st)
+        else raise (
+            Failure ("Second statement in for condition must have a boolean type")
+        )
+      | BindAssign(t, id, e) -> 
+        raise ( Failure ("Not implemented" ))
       | Return e ->
         let (t, e') = check_expr e in
         if t = func.rtyp then SReturn (t, e')
