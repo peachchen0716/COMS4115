@@ -50,9 +50,9 @@ let translate (globals, functionc) =
 		let printf_func : L.llvalue = 
 			L.declare_function "printf" printf the_module in 
 	
-		(* Dine each function (arguments are return type) 
-		   so we can call it even before we've created its body
-		*)
+	(* Define each function (arguments are return type) 
+	   so we can call it even before we've created its body
+	*)
 	let function_decls : (L.llvalue * sfunc_def) StringMap.t = 
 		let funciton_decl m fdecl = 
 			let f_name = fdecl.sfname
@@ -63,8 +63,13 @@ let translate (globals, functionc) =
 			in List.fold_left function_decl StringMap.empty functions in 
 	in
 
-	(* TODO *)
-	let build_function_body = 
+	(* Fill in the body of the given function *)
+	let build_function_body fdecl =
+		let (the_function, _) = StringMap.find fdec.sfname function_decls in
+		let builder = L.builder_at_end context (L.entry_block the_function) in
+
+		let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in 
+	(* TODO: *) 
 
 	in
 
