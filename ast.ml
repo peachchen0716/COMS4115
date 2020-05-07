@@ -26,7 +26,7 @@ type stmt =
   | Expr of expr
   | If of expr * stmt * stmt
   | While of expr * stmt
-  | For of expr * expr * expr * stmt
+  | For of stmt * expr * expr * stmt
   | BindAssign of typ * string * expr 
   | Return of expr
 
@@ -88,12 +88,12 @@ let rec string_of_stmt = function
   | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
                       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
-  | For(e1, e2, e3, s) -> "For ( " ^ string_of_expr e1 ^ "; " ^
+  | For(s1, e2, e3, s) -> "For ( " ^ string_of_stmt s1 ^ "; " ^
                           string_of_expr e2 ^ "; " ^ 
                           string_of_expr e3 ^ ")\n" ^
                           string_of_stmt s
   | BindAssign(t, v, e) -> string_of_typ t ^ " " ^ v ^ " = " ^
-                           string_of_expr e 
+                           string_of_expr e ^ "\n"
                                                             
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
                                                                

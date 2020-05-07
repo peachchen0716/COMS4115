@@ -83,8 +83,8 @@ stmt:
   | LBRACE stmt_list RBRACE               { Block $2 }
   | IF LPAREN expr RPAREN stmt ELSE stmt  { If ($3, $5, $7) }
   | WHILE LPAREN expr RPAREN stmt         { While ($3, $5) }
-  | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt      
-                                          { For ($3, $5, $7, $9) }
+  | FOR LPAREN stmt expr SEMI expr_opt RPAREN stmt      
+                                          { For ($3, $4, $6, $8) }
   | typ ID ASSIGN expr SEMI               { BindAssign($1, $2, $4) }
   | RETURN expr SEMI                      { Return $2 }
 
