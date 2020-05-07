@@ -9,7 +9,7 @@ open Sast
 module StringMap = Map.Make(String)
 
 (* translate: Sast.program -> Llvm.module *)
-let translate (globals, functionc) = 
+let translate (globals, functions) = 
 	let context = L.global_context () in 
 
 	(* Create the Llvm compilation module into 
@@ -60,7 +60,7 @@ let translate (globals, functionc) =
 				Array.of_list (List.map (fun (ty,_) -> ltype_of_typ t) fdecl.sformals)
 			in let f_type = L.fuction_type (ltype_of_typ fedcl.srtyp) formal_types in 
 			StringMap.add f_name (L.define_function f_name f_type the_module, fdecl) m
-			in List.fold_left function_decl StringMap.empty functions in 
+			in List.fold_left function_decl StringMap.empty functions 
 	in
 
 	(* Fill in the body of the given function *)
@@ -69,9 +69,27 @@ let translate (globals, functionc) =
 		let builder = L.builder_at_end context (L.entry_block the_function) in
 
 		let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in 
-	(* TODO: *) 
+		
+		(* Construct the function's "locals": formal arguments and locally
+		   declared variables. Allocate each on the stack, initialize their
+		   value, if appropriatem and store their value in the "local" map 
+	    *)
+	    let local_vars = 
+	    	let add_formal m (t, n) p =
+	    	L.set_value_name n p;
+	    	let formal = L.build_alloca (ltype_of_typ t) n builder in 
+	    	ignore (L.build_store p formal builder); StringMap.add n formal m
 
-	in
+	    	(* Allocate space for any locally declared variables and add the 
+	    	   resulting registers to out map
+	    	 *)
+ 
+ 			and add_local m (t, n) = 
+ 				let local_var = L.build_alloca (ltype_of_typ t) n builder 
+ 			in StringMap.add n local_var m in
+			let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
+						  (Array.to_list (L.params the_function)) in 
+				list.fold_left add_local formals fdecl.slocals
 
 	let lookup n = try StringMap.find n local_vars
 		with Not_found -> StringMap.find n global_vars 
@@ -88,8 +106,6 @@ let translate (globals, functionc) =
 		| SAssign (s, e) -> 
 			let e' = build_expr builder e in 
 			ignore(L.build_store e' (lookup s) builder); e'
-		(* TODO *)
-		| SBindAssign (ty, s, se) -> 
 		| SUniop (se, op) -> 
 			let e' = build_expr builder se 
 			and one = L.const_int i32_t 1 in
