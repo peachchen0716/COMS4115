@@ -175,13 +175,49 @@ let translate (globals, functions) =
 			L.build_call fdef (Array.of_list llargs) result builder 
 		in
 
-	(* TODO *)
-	let add_terminal =
+	(* LLVM insists each basic block end with exaclty one "terminator"
+	   instruction that transfer control. This function runs "instr builder"
+	   if the current block does not already have a terminator. 
+	*)
+	let add_terminal builder instr =
+		match L.block_terminator (L.insertion_block builder) with 
+		  Some _ -> ()
+		| None -> ignore (instr builder) 
 	in
 	
-	(* TODO *)
-	let build_stmt = 
-		in
+	(* Build the code for the given statement; return the builder for 
+	   for the statement's successor 
+	*)
+	let build_stmt builder = function 
+		  SBlock sl -> L.ist.fold_left build_stmt builder sl
+		| SExpr e -> ignore(build_expr builder e); builder 
+		| SReturn e -> ignore(L.build_ret (build_expr builder e) builder); builder
+		| SFor (var_decl, predicate, op_expr, stmt) -> (* TODO *)
+		| SBindAssign (ty, name, expr) -> (* TODO: maybe put it in build_expr *)
+		| SIf (predicate, then_stmt, else_stmt) ->
+			let bool_val = build_expr builder predicate in 
+			let then_bb = L.append_block context "then" the_function in 
+			ignore(build_stmt (L.builder_at_end context then_bb) then_stmt)
+			let else_bb = L.append_block context "else" the_function in 
+			ignore(build_stmt (L.builder_at_end context else_bb) else_stmt) in 
+			let end_bb = L.append_block context "end" the_function in 
+			let build_br_end = L.build_br end_bb in
+			add_terminal (L.builder_at_end context then_bb) build_br_end;
+			add_terminal (L.builder_at_end context else_bb) build_br_end;
+			ignore(L.build_cond_br then_bb else_bb builder);
+			L.builder_at_end context end_bb
+		| SWhile (predicate, body) -> 
+			let while_bb = L.append_block context "while" the_function in
+			let build_br_while = L.build_br while_bb in 
+			ignore (build_br_while builder); 
+			let while_builder = L.builder_at_end context while_bb in 
+			let bool_val = build_expr while_builder predicate in 
+			let body_bb = L.append_block context "while_body" the_function in 
+			add_terminal (build_stmt (L.builder_at_end context body_bb) body) build_br_while;
+			let end_bb = L.append_block context "while_end" the_function in 
+			ignore(L.build_cond_br bool_val body_bb end_bb while_builder);
+			L.builder_at_end context end_bb
+ 	in
 	(* Build the code for each statement in the function *)
 	let func_builder = build_stmt builder (SBlock fdecl.sbody) in
 	(* Add a return if the last block falls off the end *)
