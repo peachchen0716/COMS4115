@@ -1,4 +1,4 @@
- (* Code generation: produce IR code from a semantically checked AST 
+(* Code generation: produce IR code from a semantically checked AST 
 	using LLVM module 
 *)
 
@@ -100,7 +100,7 @@ let translate (globals, functions) =
 		| SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
 		| SFLit f    -> L.const_float float_t f
 		| SStrLit s  -> L.build_global_stringptr (s^"\x00") "strptr" builder
-		| SListLit l -> (* TODO: list expr *)
+		| SListLit l -> L.build_ptr
 		| SId s      -> L.build_load (lookup s) s builder
 		| SNoexpr    -> L.const_int i32_t 0
 		| SAssign (s, e) -> 
