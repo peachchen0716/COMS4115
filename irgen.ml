@@ -89,11 +89,11 @@ let translate (globals, functions) =
  			in StringMap.add n local_var m in
 			let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
 						  (Array.to_list (L.params the_function)) in 
-				list.fold_left add_local formals fdecl.slocals
-
-	let lookup n = try StringMap.find n local_vars
-		with Not_found -> StringMap.find n global_vars 
-	in 
+				List.fold_left add_local formals fdecl.slocals
+			in
+		let lookup n = try StringMap.find n local_vars
+			with Not_found -> StringMap.find n global_vars 
+		in 
 
 	let rec build_sexpr builder ((_, e): sexpr) = match e with 
 		  SLiteral i -> L.const_int i32_t i 
@@ -220,7 +220,9 @@ let translate (globals, functions) =
  	in
 	(* Build the code for each statement in the function *)
 	let func_builder = build_stmt builder (SBlock fdecl.sbody) in
-	(* Add a return if the last block falls off the end *)
+	(* Add a return if the last block falls off the end 
+	   TODO: if no return 0, delete	
+	*)
     add_terminal func_builder (L.build_ret (L.const_int i32_t 0))
     in
 
