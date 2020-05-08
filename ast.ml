@@ -63,15 +63,17 @@ let rec string_of_typ = function
   | None -> "None"
   | List(t) -> "list " ^ string_of_typ t
  
-let rec string_of_expr = function
+let rec string_of_list = function
+    [] -> ""
+  | hd :: tl -> string_of_expr hd ^ ", " ^ string_of_list tl
+and string_of_expr = function
     Literal(l) -> string_of_int l
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | FLit(f) -> string_of_float f
   | StrLit(s) -> s
   | Id(s) -> s
-  | ListLit([]) -> ""
-  | ListLit(hd :: tl) -> string_of_expr hd ^ " " ^  string_of_expr (ListLit(tl))
+  | ListLit(lst) -> "[ " ^ string_of_list lst ^ " ]"
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Uniop(e, o) -> string_of_expr e ^ " " ^ string_of_op o
