@@ -8,7 +8,10 @@ module StringMap = Map.Make(String)
 (* Semantic checking of the AST. Returns an SAST if successful,
    throws an exception if something is wrong.
 
-   Check each global statement, then check each function *)
+   Check each global statement, then check each function 
+   We check the following error:
+      function have no duplicated formals 
+       *)
 let check (global_stmts, functions) =
 
   (* Verify a list of bindings has no duplicate names *)
@@ -20,9 +23,6 @@ let check (global_stmts, functions) =
       | _ :: t -> dups t
     in dups (List.sort (fun (_,a) (_,b) -> compare a b) binds)
   in
-
-  (* Make sure no globals duplicate *)
-  (* check_binds "global" globals; *)
 
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls =
@@ -55,10 +55,7 @@ let check (global_stmts, functions) =
     with Not_found -> raise (Failure ("unrecognized function " ^ s))
   in
 
-  (* Ensure "main" is defined *)
-  (* let _ = find_func "main" in *)
-
-  (* Pyni parse locals varibale declared in the function body, return a bind list*)
+  (* Pyni Parse locals varibale declared in the function body, return a bind list*)
   let rec get_locals body = match body with
     [] -> []
   | hd :: tl -> match hd with 
@@ -66,148 +63,153 @@ let check (global_stmts, functions) =
     | _ ->  get_locals tl
   in
 
+  (* Pyni Check if duplicated binding exists in global stmts *)
   check_binds "global" (get_locals global_stmts);
 
-    (* Raise an exception if the given rvalue type cannot be assigned to
-       the given lvalue type *)
-    let check_assign lvaluet rvaluet err =
-      if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in
+  (* Raise an exception if the given rvalue type cannot be assigned to
+     the given lvalue type *)
+  let check_assign lvaluet rvaluet err =
+    if lvaluet = rvaluet then lvaluet else raise (Failure err)
+  in
 
-    (* Return a variable from our local symbol table *)
-    let type_of_identifier s stable =
-      try StringMap.find s stable 
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
-    in
+  (* Return a variable from our local symbol table *)
+  let type_of_identifier s stable =
+    try StringMap.find s stable 
+    with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+  in
 
-    (* Pyni Return a sementically checked list and the type of its elements 
-     * raise an error if element types are inconsistent*) 
-    let rec check_list lst symbols = match lst with
-      [] -> (None, [])
-    | hd :: tl -> 
-    let (t1, e1) = check_expr hd symbols
-    and (t2, e2) = check_list tl symbols in
-    let err = "illegal list of type " ^ string_of_typ t1 ^ 
-              " with type " ^ "" 
-    in 
-    if t2 = None || t1 = t2 then (t1, (t1, e1) :: e2)
-    else raise (Failure err)
-    
-    (* Return a semantically-checked expression, i.e., with a type *)
-    and check_expr expr symbols = match expr with 
-        Literal l -> (Int, SLiteral l)
-      | BoolLit l -> (Bool, SBoolLit l)
-      | FLit l -> (Float, SFLit l)
-      | StrLit l -> (String, SStrLit l)
-      | Id var -> (type_of_identifier var symbols, SId var)
-      | ListLit lst -> 
-        let (t, slst) = check_list lst symbols
-        in 
-        (t, SListLit(t, slst))
-      | Assign(var, e) as ex ->
-        let lt = type_of_identifier var symbols
-        (* TODO: comfirm which symbol table should be passed in *)
-        and (rt, e') = check_expr e symbols in
-        let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^
-                  string_of_typ rt ^ " in " ^ string_of_expr ex 
-        in
-        (check_assign lt rt err, SAssign(var, (rt, e')))
-      | Uniop(e, op)-> 
-        (* TODO: comfirm which symbol table should be passed in *)
-        let (t, e') = check_expr e symbols in
-        let err = "illegal uniary operation " ^ string_of_typ t ^ " " ^
-                  string_of_op op
-        in 
-        (* TODO: for now only int can have uniop, !boolean should also be allowed in the future *)
-        if t = Int then 
-          let rt = match op with
-              Incre when t = Int -> Int
-            | Decre when t = Int -> Int
-            | _ -> raise (Failure err)
-          in 
-          (rt, SUniop((t, e'), op))
-        else raise (Failure err)
-      | Binop(e1, op, e2) as e ->
-        (* TODO: comfirm which symbol table should be passed in *)
-        let (t1, e1') = check_expr e1 symbols
-        and (t2, e2') = check_expr e2 symbols in
-        let err = "illegal binary operator " ^
-                  string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-                  string_of_typ t2 ^ " in " ^ string_of_expr e
-        in
-        (* All binary operators require operands of the same type*)
-        if t1 = t2 then
-          (* Determine expression type based on operator and operand types *)
-          let t = match op with
-              Add | Sub when t1 = Int -> Int
-            | Equal | Neq -> Bool
-            | Less when t1 = Int -> Bool
-            | And | Or when t1 = Bool -> Bool
-            | _ -> raise (Failure err)
-          in
-          (t, SBinop((t1, e1'), op, (t2, e2')))
-        else raise (Failure err)
-      | Call(fname, args) as call ->
-        let fd = find_func fname in
-        let param_length = List.length fd.formals in
-        if List.length args != param_length then
-          raise (Failure ("expecting " ^ string_of_int param_length ^
-                          " arguments in " ^ string_of_expr call))
-        else let check_call (ft, _) e =
-        (* TODO: comfirm which symbol table should be passed in *)
-               let (et, e') = check_expr e symbols in
-               let err = "illegal argument found " ^ string_of_typ et ^
-                         " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
-               in (check_assign ft et err, e')
-          in
-          let args' = List.map2 check_call fd.formals args
-          in (fd.rtyp, SCall(fname, args'))
-      | Noexpr -> (None, SNoexpr)
-    in
-
-    let check_bool_expr e symbols =
-        (* TODO: comfirm which symbol table should be passed in *)
+  (* Pyni Return a sementically checked list and the type of its elements 
+   * raise an error if element types are inconsistent*) 
+  let rec check_list lst symbols = match lst with
+    [] -> (None, [])
+  | hd :: tl -> 
+  let (t1, e1) = check_expr hd symbols
+  and (t2, e2) = check_list tl symbols in
+  let err = "inconsistent types of " ^ string_of_typ t1 ^ 
+            " and " ^ string_of_typ t2 ^ " in the same list"
+  in 
+  if t2 = None || t1 = t2 then (t1, (t1, e1) :: e2)
+  else raise (Failure err)
+  
+  (* Return a semantically-checked expression, i.e., with a type *)
+  and check_expr expr symbols = match expr with 
+      Literal l -> (Int, SLiteral l)
+    | BoolLit l -> (Bool, SBoolLit l)
+    | FLit l -> (Float, SFLit l)
+    | StrLit l -> (String, SStrLit l)
+    | Id var -> (type_of_identifier var symbols, SId var)
+    | ListLit lst -> 
+      let (t, slst) = check_list lst symbols
+      in 
+      (List(t), SListLit(t, slst))
+    | Assign(var, e) as ex ->
+      let lt = type_of_identifier var symbols
+      (* TODO: comfirm which symbol table should be passed in *)
+      and (rt, e') = check_expr e symbols in
+      let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^
+                string_of_typ rt ^ " in " ^ string_of_expr ex 
+      in
+      (check_assign lt rt err, SAssign(var, (rt, e')))
+    | Uniop(e, op)-> 
+      (* TODO: comfirm which symbol table should be passed in *)
       let (t, e') = check_expr e symbols in
-      match t with
-      | Bool -> (t, e')
-      |  _ -> raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
-    in
-
-    let rec check_stmt_list ?return_typ:(rtyp=None) stmt_lst symbols = 
-      match stmt_lst with 
-        [] -> []
-      (*optimization, not necessary (Flatten blocks) *)
-      | Block sl :: sl'  -> check_stmt_list (sl @ sl') symbols ~return_typ:rtyp
-      | s :: sl -> (check_stmt s symbols ~return_typ:rtyp) :: 
-                   (check_stmt_list sl symbols ~return_typ:rtyp)
-    
-    (* Return a semantically-checked statement i.e. containing sexprs *)
-    and check_stmt ?return_typ:(rtyp=None) stmt symbols = match stmt with 
-      (* A block is correct if each statement is correct and nothing
-         follows any Return statement.  Nested blocks are flattened. *)
-        Block sl -> SBlock (check_stmt_list sl symbols)
-      | Expr e -> SExpr (check_expr e symbols)
-      | If(e, st1, st2) ->
-        SIf(check_bool_expr e symbols, check_stmt st1 symbols, check_stmt st2 symbols)
-      | While(e, st) ->
-        SWhile(check_bool_expr e symbols, check_stmt st symbols)
-      | For(s1, e2, e3, st) ->
-        let (t2, e2') = check_expr e2 symbols
-        and e3' = check_expr e3 symbols
+      let err = "illegal uniary operation " ^ string_of_typ t ^ " " ^
+                string_of_op op
+      in 
+      (* TODO: for now only int can have uniop, !boolean should also be allowed in the future *)
+      if t = Int then 
+        let rt = match op with
+            Incre when t = Int -> Int
+          | Decre when t = Int -> Int
+          | _ -> raise (Failure err)
+        in 
+        (rt, SUniop((t, e'), op))
+      else raise (Failure err)
+    | Binop(e1, op, e2) as e ->
+      (* TODO: comfirm which symbol table should be passed in *)
+      let (t1, e1') = check_expr e1 symbols
+      and (t2, e2') = check_expr e2 symbols in
+      let err = "illegal binary operator " ^
+                string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                string_of_typ t2 ^ " in " ^ string_of_expr e
+      in
+      (* All binary operators require operands of the same type*)
+      if t1 = t2 then
+        (* Determine expression type based on operator and operand types *)
+        let t = match op with
+            Add | Sub when t1 = Int -> Int
+          | Equal | Neq -> Bool
+          | Less when t1 = Int -> Bool
+          | And | Or when t1 = Bool -> Bool
+          | _ -> raise (Failure err)
         in
-        if t2 = Bool then SFor(check_stmt s1 symbols, (t2, e2'), e3', check_stmt st symbols)
-        else raise (
-            Failure ("Second statement in for condition must have a boolean type")
-        )
-      | BindAssign(t, id, e) -> 
-        raise ( Failure ("Not implemented" ))
-      | Return e ->
-        let (t, e') = check_expr e symbols in
-        if rtyp = None || t = rtyp then SReturn (t, e')
-        else raise (
-            Failure ("return gives " ^ string_of_typ t ^ " expected " ^
-                     string_of_typ rtyp ^ " in " ^ string_of_expr e))
-    in 
+        (t, SBinop((t1, e1'), op, (t2, e2')))
+      else raise (Failure err)
+    | Call(fname, args) as call ->
+      let fd = find_func fname in
+      let param_length = List.length fd.formals in
+      if List.length args != param_length then
+        raise (Failure ("expecting " ^ string_of_int param_length ^
+                        " arguments in " ^ string_of_expr call))
+      else let check_call (ft, _) e =
+      (* TODO: comfirm which symbol table should be passed in *)
+             let (et, e') = check_expr e symbols in
+             let err = "illegal argument found " ^ string_of_typ et ^
+                       " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
+             in (check_assign ft et err, e')
+        in
+        let args' = List.map2 check_call fd.formals args
+        in (fd.rtyp, SCall(fname, args'))
+    | Noexpr -> (None, SNoexpr)
+  in
+
+  let check_bool_expr e symbols =
+      (* TODO: comfirm which symbol table should be passed in *)
+    let (t, e') = check_expr e symbols in
+    match t with
+    | Bool -> (t, e')
+    |  _ -> raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
+  in
+
+  let rec check_stmt_list ?return_typ:(rtyp=None) stmt_lst symbols = 
+    match stmt_lst with 
+      [] -> []
+    (*optimization, not necessary (Flatten blocks) *)
+    | Block sl :: sl'  -> check_stmt_list (sl @ sl') symbols ~return_typ:rtyp
+    | s :: sl -> (check_stmt s symbols ~return_typ:rtyp) :: 
+                 (check_stmt_list sl symbols ~return_typ:rtyp)
+  
+  (* Return a semantically-checked statement i.e. containing sexprs *)
+  and check_stmt ?return_typ:(rtyp=None) stmt symbols = match stmt with 
+    (* A block is correct if each statement is correct and nothing
+       follows any Return statement.  Nested blocks are flattened. *)
+      Block sl -> SBlock (check_stmt_list sl symbols)
+    | Expr e -> SExpr (check_expr e symbols)
+    | If(e, st1, st2) ->
+      SIf(check_bool_expr e symbols, check_stmt st1 symbols, check_stmt st2 symbols)
+    | While(e, st) ->
+      SWhile(check_bool_expr e symbols, check_stmt st symbols)
+    | For(s1, e2, e3, st) ->
+      let (t2, e2') = check_expr e2 symbols
+      and e3' = check_expr e3 symbols in
+      if t2 = Bool then SFor(check_stmt s1 symbols, (t2, e2'), e3', check_stmt st symbols)
+      else raise (
+          Failure ("Second statement in for condition must have a boolean type")
+      )
+    | BindAssign(lt, id, e) -> 
+      let (rt, e') = check_expr e symbols in
+      let err = "illegal initialization of " ^ string_of_typ lt ^ " = " ^
+                string_of_typ rt ^ " in " ^ string_of_expr e 
+      in
+      if lt = rt then SBindAssign(lt, id, (rt, e'))
+      else raise ( Failure err )
+    | Return e ->
+      let (t, e') = check_expr e symbols in
+      if rtyp = None || t = rtyp then SReturn (t, e')
+      else raise (
+          Failure ("return gives " ^ string_of_typ t ^ " expected " ^
+                   string_of_typ rtyp ^ " in " ^ string_of_expr e))
+  in 
 
   let global_locals = get_locals global_stmts
   in 

@@ -41,7 +41,10 @@ type sprogram = sstmt list * sfunc_def list
 
 
 (* Pretty-printing functions *)
-let rec string_of_sexpr (t, e) =
+let rec string_of_slist = function
+    [] -> ""
+  | hd :: tl -> string_of_sexpr hd ^ ", " ^ string_of_slist tl
+and string_of_sexpr (t, e) =
   "(" ^ string_of_typ t ^ " : " ^ (match e with
         SLiteral(l) -> string_of_int l
       | SBoolLit(true) -> "true"
@@ -49,7 +52,7 @@ let rec string_of_sexpr (t, e) =
       | SFLit(l) -> string_of_float l
       | SStrLit(s) -> s
       | SId(s) -> s
-      | SListLit(_, lst) -> "Not implemented"
+      | SListLit(_, lst) -> "[ " ^ string_of_slist lst ^ " ]"
       | SUniop(e, o) -> string_of_sexpr e ^ " " ^ string_of_op o
       | SBinop(e1, o, e2) ->
         string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
