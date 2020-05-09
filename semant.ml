@@ -171,57 +171,90 @@ let check (global_stmts, functions) =
     |  _ -> raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
   in
 
+  (* Pyni Add a bind into symbol table and return the new symbol table 
+   * raise error if the bind name exists *)
+  (*
+  let add_to_symbol_table s t stable = 
+    let find_stable s m = 
+      try StringMap.find s m 
+      with 
+      | Not_found -> 0 
+      | _ -> 1
+    in
+    let exist = find_stable s stable in
+      match exist with
+      | 0 -> StringMap.add s t stable
+      | _ -> raise (Failure ("variable with the same name declared before"))
+  in
+  *)
+
   let rec check_stmt_list ?return_typ:(rtyp=None) stmt_lst symbols = 
     match stmt_lst with 
-      [] -> []
+      [] -> ( [], symbols )
     (*optimization, not necessary (Flatten blocks) *)
-    | Block sl :: sl'  -> check_stmt_list (sl @ sl') symbols ~return_typ:rtyp
-    | s :: sl -> (check_stmt s symbols ~return_typ:rtyp) :: 
-                 (check_stmt_list sl symbols ~return_typ:rtyp)
+    | Block sl :: sl'  -> check_stmt_list (sl @ sl') symbols ~return_typ:rtyp 
+    | s :: sl -> 
+      let (sst, m') =  check_stmt s symbols ~return_typ:rtyp in
+      let (ssl, m'') = check_stmt_list sl m' ~return_typ:rtyp in
+      ( sst :: ssl, m'' )
   
   (* Return a semantically-checked statement i.e. containing sexprs *)
   and check_stmt ?return_typ:(rtyp=None) stmt symbols = match stmt with 
     (* A block is correct if each statement is correct and nothing
        follows any Return statement.  Nested blocks are flattened. *)
-      Block sl -> SBlock (check_stmt_list sl symbols)
-    | Expr e -> SExpr (check_expr e symbols)
+      Block sl -> let (ssl, m') = check_stmt_list sl symbols in
+      ( SBlock (ssl), symbols )
+    | Expr e -> ( SExpr (check_expr e symbols), symbols )
     | If(e, st1, st2) ->
-      SIf(check_bool_expr e symbols, check_stmt st1 symbols, check_stmt st2 symbols)
+      (* Assume if statement block does not variable declaration to symbol table *)
+      let (sst1, _ ) = check_stmt st1 symbols 
+      and (sst2, _ ) = check_stmt st2 symbols
+      in
+      ( SIf(check_bool_expr e symbols, sst1, sst2), symbols )
     | While(e, st) ->
-      SWhile(check_bool_expr e symbols, check_stmt st symbols)
+      let (sst, _ ) = check_stmt st symbols 
+      in
+      ( SWhile(check_bool_expr e symbols, sst), symbols )
     | For(s1, e2, e3, st) ->
-      let (t2, e2') = check_expr e2 symbols
-      and e3' = check_expr e3 symbols in
-      if t2 = Bool then SFor(check_stmt s1 symbols, (t2, e2'), e3', check_stmt st symbols)
+      let (sst1, m') = check_stmt s1 symbols  
+      in
+      let (sst2, m'') = check_stmt st m'
+      and (t2, e2') = check_expr e2 m' 
+      and e3' = check_expr e3 m' in
+      if t2 = Bool then  
+          ( SFor(sst1, (t2, e2'), e3', sst2), symbols )
       else raise (
-          Failure ("Second statement in for condition must have a boolean type")
+          Failure ("Second statement in for condition must be boolean type")
       )
     | BindAssign(lt, id, e) -> 
       let (rt, e') = check_expr e symbols in
       let err = "illegal initialization of " ^ string_of_typ lt ^ " = " ^
                 string_of_typ rt ^ " in " ^ string_of_expr e 
       in
-      if lt = rt then SBindAssign(lt, id, (rt, e'))
+      if lt = rt then 
+          let m' = StringMap.add id lt symbols
+          in
+          ( SBindAssign(lt, id, (rt, e')), m' )
       else raise ( Failure err )
     | Return e ->
       let (t, e') = check_expr e symbols in
-      if rtyp = None || t = rtyp then SReturn (t, e')
+      if rtyp = None || t = rtyp then ( SReturn (t, e'), symbols )
       else raise (
           Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                    string_of_typ rtyp ^ " in " ^ string_of_expr e))
   in 
 
-  let global_locals = get_locals global_stmts
-  in 
+  let global_locals = get_locals global_stmts in 
 
+  (*
   let global_symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
       StringMap.empty global_locals
   in
+  *)
 
   let check_func func =
     (* Make sure no formals or locals are void or duplicates *)
-    let func_locals = get_locals func.body
-    in 
+    let func_locals = get_locals func.body in 
     
     check_binds "formal" func.formals;
     check_binds "local" func_locals;
@@ -235,8 +268,19 @@ let check (global_stmts, functions) =
     { srtyp = func.rtyp;
       sfname = func.fname;
       sformals = func.formals;
-      sbody = check_stmt_list func.body symbols ~return_typ:func.rtyp
+      sbody = fst (check_stmt_list func.body symbols ~return_typ:func.rtyp)
     }
-  and sstmt_lst = check_stmt_list global_stmts global_symbols
-  in
+  in 
+
+  (* Pyni Master function to check the globals stmts *)
+  (*
+  let rec check_global_stmts lst m = function
+      [] -> []
+    | hd :: tl -> let (shd, m') = check_stmt hd m in check_global_stmts tl m'
+  in 
+  *)
+
+  (* let sstmt_lst = check_stmt_list global_stmts global_symbols in *)
+  let (sstmt_lst, _) = check_stmt_list global_stmts StringMap.empty in
+
   (sstmt_lst, List.map check_func functions)
