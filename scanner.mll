@@ -61,6 +61,7 @@ rule token = parse
 | "False"  { BLIT(false) }
 | "float"  { FLOAT }
 | "str"    { STRING }
+| "None"   { NONE }
 | "list"   { LIST }
 | digit+ as lem  { LITERAL(int_of_string lem) }
 | digit+ '.' digit* as f { FLIT(float_of_string f) }
