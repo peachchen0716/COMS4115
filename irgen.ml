@@ -18,7 +18,7 @@ let translate (globals, functions) =
 	let the_module = L.create_module context "Pyni" in
 
 	(* Get types from the context 
-		TODO: string, None, dict
+		TODO: dict
 	*)
 	let i32_t     = L.i32_type context
 	and i8_t      = L.i8_type context
@@ -33,6 +33,7 @@ let translate (globals, functions) =
 		| A.Bool -> i1_t
 		| A.Float -> float_t
 		| A.String -> str_t
+		| A.None -> i1_t
 		| A.List t -> list_t (ltype_of_typ t)
 	in 
 
@@ -100,6 +101,7 @@ let translate (globals, functions) =
 		| SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
 		| SFLit f    -> L.const_float float_t f
 		| SStrLit s  -> L.build_global_stringptr (s^"\x00") "strptr" builder
+		| SNone      -> L.const_int i1_t 0
 		| SListLit l -> L.build_ptr
 		| SId s      -> L.build_load (lookup s) s builder
 		| SNoexpr    -> L.const_int i32_t 0
