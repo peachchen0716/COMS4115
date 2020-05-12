@@ -202,57 +202,40 @@ let translate (stmts, functions) =
  	in
 
 	(* build the main block of pyni *)
-	let build_main main_stmts = 
+	let build_main main_stmts funcs func_decls= 
 		(* create the main function *)
 		let main : L.lltype = L.var_arg_function_type i1_t [||] in
 		let main_func : L.llvalue = L.declare_function "main" main the_module in 
 		let main_builder = L.builder_at_end context (L.entry_block main_func) in
 
-		let main_end_builder = 
+		let (main_end_builder, global_table, _) = 
 			build_stmt 1 main_builder StringMap.empty StringMap.empty main_func (SBlock main_stmts) 
 		in
-		add_terminal main_end_builder (L.build_ret (L.const_int i1_t 0))
-	in
-	
 
-	(* Fill in the body of the given function *)
-	let build_function_body func_def =
-		let (the_function, _) = StringMap.find fdec.sfname function_decls in
-		let f_builder = L.builder_at_end context (L.entry_block the_function) in
-		
-		
-
-		(* Build a local symbol table and first fill it with functiob's formals 
-	    *)
-	    let local_table = 
-	    	let add_formal m (t, n) p =
-	    	L.set_value_name n p;
+		(* Fill in the body of the given function *)
+		let build_function_body func_def func_decls=
+			let (the_function, _) = StringMap.find fdec.sfname func_decls in
+			let f_builder = L.builder_at_end context (L.entry_block the_function) in
+			
+			(* Build a local symbol table and first fill it with functiob's formals  
+	    	 *) 
+	    	let add_formal m (t, n) p = L.set_value_name n p;
 	    	let formal = L.build_alloca (ltype_of_typ t) n builder in 
 	    	ignore (L.build_store p formal builder); StringMap.add n formal m
 
-	    	(* Allocate space for any locally declared variables and add the 
-	    	   resulting registers to out map
-	    	 *)
- 
- 			and add_local m (t, n) = 
- 				let local_var = L.build_alloca (ltype_of_typ t) n builder 
- 			in StringMap.add n local_var m in
-			let formals = List.fold_left2 add_formal StringMap.empty func_def.sformals
-						  (Array.to_list (L.params the_function)) in 
-				List.fold_left add_local formals func_def.slocals (* change this to a local_list*)
-			in
-		let lookup n = try StringMap.find n local_vars
-			with Not_found -> StringMap.find n global_vars 
-	in 
+	    	let local_table = List.fold_left2 add_formal StringMap.empty func_def.sformals
+						  (Array.to_list (L.params the_function))
+	   
+ 			let (f_end_builder, _, _) = build_stmt 0 f_builder global_table local_table the_function (SBlock func_def.sbody) in 
 
-	(* Build the code for each statement in the function *)
-	let func_builder = build_stmt scope builder glo_table loc_table func_block (SBlock func_def.sbody) in
-	(* Add a return if the last block falls off the end 
-	   TODO: if no return 0, delete	
-	*)
-    add_terminal func_builder (L.build_ret (L.const_int i32_t 0))
-    in
-    build_main stmts;
-	List.iter build_function_body functions;
+			(* Add a return if the last block falls off the end *)
+    		add_terminal func_builder (L.build_ret (L.const_int i32_t 0))
+    	in
+    	add_terminal main_end_builder (L.build_ret (L.const_int i1_t 0))
+    	in
+    	List.iter build_function_body funcs func_decls
+	in
+	
+    build_main stmts functions function_decls;
 	the_module
 
