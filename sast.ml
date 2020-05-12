@@ -10,6 +10,8 @@ and sx =
   | SStrLit of string
   | SId of string
   | SListLit of typ * sexpr list
+  | SListAccess of sexpr * sexpr
+  | SListSlice of sexpr * sexpr * sexpr
   | SUniop of sexpr * op
   | SBinop of sexpr * op * sexpr
   | SAssign of string * sexpr
@@ -53,6 +55,10 @@ and string_of_sexpr (t, e) =
       | SStrLit(s) -> s
       | SId(s) -> s
       | SListLit(_, lst) -> "[ " ^ string_of_slist lst ^ " ]"
+      | SListAccess(e1, e2) -> string_of_sexpr e1 ^ "[" ^ string_of_sexpr e2 ^ "]"
+      | SListSlice(e1, e2, e3) -> 
+        string_of_sexpr e1 ^ "[" ^ string_of_sexpr e2 ^ " : " ^ string_of_sexpr e3 ^ "]"
+
       | SUniop(e, o) -> string_of_sexpr e ^ " " ^ string_of_op o
       | SBinop(e1, o, e2) ->
         string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2

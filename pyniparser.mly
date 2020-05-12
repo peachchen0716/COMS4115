@@ -27,6 +27,8 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
+%nonassoc LSQUA 
+%nonassoc RSQUA
 
 %left INCRE DECRE NOT
 %right ASSIGN
@@ -123,15 +125,20 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | LSQUA args_opt RSQUA 
                      { ListLit($2) }
+  | list_access      { $1 }
   | LPAREN expr RPAREN 
                      { $2 }
   | ID LPAREN args_opt RPAREN 
                      { Call ($1, $3) }
 
+list_access:
+  | expr LSQUA expr RSQUA { ListAccess($1, $3) }
+  | expr LSQUA expr COLON expr RSQUA { ListSlice($1, $3, $5) }
+
 args_opt:
-    { [] }
-    | args { $1 }
+    /* no arg */ { [] }
+  | args         { $1 }
 
 args:
     expr { [$1] }
-    | expr COMMA args { $1::$3 } 
+  | expr COMMA args { $1::$3 } 

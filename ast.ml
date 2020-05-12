@@ -14,6 +14,8 @@ type expr =
   | StrLit of string
   | Id of string
   | ListLit of expr list
+  | ListAccess of expr * expr
+  | ListSlice of expr * expr * expr
   | Uniop of expr * op
   | Binop of expr * op * expr
   | Assign of string * expr
@@ -76,6 +78,9 @@ and string_of_expr = function
   | StrLit(s) -> s
   | Id(s) -> s
   | ListLit(lst) -> "[ " ^ string_of_list lst ^ " ]"
+  | ListAccess(e1, e2) -> string_of_expr e1 ^ "[" ^ string_of_expr e2 ^ "]"
+  | ListSlice(e1, e2, e3) -> string_of_expr e1 ^ "[" ^ string_of_expr e2 ^
+                             " : " ^ string_of_expr e3 ^ "]"
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Uniop(e, o) -> string_of_expr e ^ " " ^ string_of_op o
