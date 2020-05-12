@@ -189,12 +189,14 @@ let translate (globals, functions) =
 	
 	(* Build the code for the given statement; return the builder for 
 	   for the statement's successor 
+		TODO: pass in a list to build stmt to get the variable declarations
 	*)
 	let build_stmt builder = function 
-		  SBlock sl -> L.ist.fold_left build_stmt builder sl
+		  SBlock sl -> List.fold_left build_stmt builder sl
 		| SExpr e -> ignore(build_expr builder e); builder 
 		| SReturn e -> ignore(L.build_ret (build_expr builder e) builder); builder
 		| SFor (var_decl, predicate, op_expr, stmt) -> (* TODO *)
+		| Assign(name, expr) -> (* TODO:assgin btw declared var and expr *)
 		| SBindAssign (ty, name, expr) -> (* TODO: maybe put it in build_expr *)
 		| SIf (predicate, then_stmt, else_stmt) ->
 			let bool_val = build_expr builder predicate in 
