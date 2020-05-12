@@ -32,7 +32,6 @@ rule token = parse
 | '-'      { MINUS }
 | "++"     { INCRE }
 | "--"     { DECRE }
-(* mod *)
 | "%"      { MOD }
 | '*' 	   { TIMES }
 | '/'      { DIVIDE } 
@@ -47,11 +46,10 @@ rule token = parse
 | '>'      { GT }
 | "<="     { LTE }
 | ">="     { GTE }
-| "&&"     { AND }
-| "||"     { OR }
+| "and"     { AND }
+| "or"     { OR }
 | "if"     { IF }
 | "else"   { ELSE }
-(* for *)
 | "for"    { FOR } 
 | "while"  { WHILE }
 | "return" { RETURN }

@@ -115,15 +115,15 @@ let check (global_stmts, functions) =
       let (t, e') = check_expr e symbols in
       let err = "illegal uniary operation " ^ string_of_typ t ^ " " ^
                 string_of_op op
+      in
+      let is_valid = match t, op with
+          Int, Incre -> 1
+        | Int, Decre -> 1
+        | Bool, Not -> 1      
+        | _, _ -> 0  
       in 
-      (* TODO: for now only int can have uniop, !boolean should also be allowed in the future *)
-      if t = Int then 
-        let rt = match op with
-            Incre when t = Int -> Int
-          | Decre when t = Int -> Int
-          | _ -> raise (Failure err)
-        in 
-        (rt, SUniop((t, e'), op))
+      if is_valid = 1 
+      then (t, SUniop((t, e'), op))
       else raise (Failure err)
     | Binop(e1, op, e2) as e ->
       let (t1, e1') = check_expr e1 symbols

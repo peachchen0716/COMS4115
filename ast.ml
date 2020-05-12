@@ -1,7 +1,7 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
-        | GreaterEq | LessEq | Incre | Decre | Mod
+        | GreaterEq | LessEq | Incre | Decre | Mod | Not
 
 type typ = Int | Bool | Float | String | None | List of typ
 
@@ -55,6 +55,7 @@ let string_of_op = function
   | Incre -> "++"
   | Decre -> "--"
   | Mod -> "%"
+  | Not -> "!"
                                                      
 let rec string_of_typ = function
     Int -> "int"
