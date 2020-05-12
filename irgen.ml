@@ -211,6 +211,7 @@ let translate (stmts, functions) =
 		let (main_end_builder, global_table, _) = 
 			build_stmt 1 main_builder StringMap.empty StringMap.empty main_func (SBlock main_stmts) 
 		in
+		add_terminal main_end_builder (L.build_ret (L.const_int i1_t 0));
 
 		(* Fill in the body of the given function *)
 		let build_function_body func_def func_decls=
@@ -230,8 +231,6 @@ let translate (stmts, functions) =
 
 			(* Add a return if the last block falls off the end *)
     		add_terminal func_builder (L.build_ret (L.const_int i32_t 0))
-    	in
-    	add_terminal main_end_builder (L.build_ret (L.const_int i1_t 0))
     	in
     	List.iter build_function_body funcs func_decls
 	in
