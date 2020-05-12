@@ -69,7 +69,9 @@ let check (global_stmts, functions) =
   (* Raise an exception if the given rvalue type cannot be assigned to
      the given lvalue type *)
   let check_assign lvaluet rvaluet err =
-    if lvaluet = rvaluet then lvaluet else raise (Failure err)
+    if (lvaluet = rvaluet) || (rvaluet = None)
+    then lvaluet 
+    else raise (Failure err)
   in
 
   (* Return a variable from our local symbol table *)
@@ -104,14 +106,12 @@ let check (global_stmts, functions) =
       (List(t), SListLit(t, slst))
     | Assign(var, e) as ex ->
       let lt = type_of_identifier var symbols
-      (* TODO: comfirm which symbol table should be passed in *)
       and (rt, e') = check_expr e symbols in
       let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^
                 string_of_typ rt ^ " in " ^ string_of_expr ex 
       in
       (check_assign lt rt err, SAssign(var, (rt, e')))
     | Uniop(e, op)-> 
-      (* TODO: comfirm which symbol table should be passed in *)
       let (t, e') = check_expr e symbols in
       let err = "illegal uniary operation " ^ string_of_typ t ^ " " ^
                 string_of_op op
@@ -126,7 +126,6 @@ let check (global_stmts, functions) =
         (rt, SUniop((t, e'), op))
       else raise (Failure err)
     | Binop(e1, op, e2) as e ->
-      (* TODO: comfirm which symbol table should be passed in *)
       let (t1, e1') = check_expr e1 symbols
       and (t2, e2') = check_expr e2 symbols in
       let err = "illegal binary operator " ^
@@ -152,7 +151,6 @@ let check (global_stmts, functions) =
         raise (Failure ("expecting " ^ string_of_int param_length ^
                         " arguments in " ^ string_of_expr call))
       else let check_call (ft, _) e =
-      (* TODO: comfirm which symbol table should be passed in *)
              let (et, e') = check_expr e symbols in
              let err = "illegal argument found " ^ string_of_typ et ^
                        " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
@@ -164,7 +162,6 @@ let check (global_stmts, functions) =
   in
 
   let check_bool_expr e symbols =
-      (* TODO: comfirm which symbol table should be passed in *)
     let (t, e') = check_expr e symbols in
     match t with
     | Bool -> (t, e')
@@ -231,7 +228,7 @@ let check (global_stmts, functions) =
       let err = "illegal initialization of " ^ string_of_typ lt ^ " = " ^
                 string_of_typ rt ^ " in " ^ string_of_expr e 
       in
-      if lt = rt then 
+      if (lt = rt) || (rt = None) then 
           let m' = StringMap.add id lt symbols
           in
           ( SBindAssign(lt, id, (rt, e')), m' )
