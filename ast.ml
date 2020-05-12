@@ -1,7 +1,7 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
-        | GreaterEq | LessEq | Incre | Decre 
+        | GreaterEq | LessEq | Incre | Decre | Mod
 
 type typ = Int | Bool | Float | String | None | List of typ
 
@@ -54,6 +54,7 @@ let string_of_op = function
   | Or -> "||"
   | Incre -> "++"
   | Decre -> "--"
+  | Mod -> "%"
                                                      
 let rec string_of_typ = function
     Int -> "int"
@@ -80,7 +81,7 @@ and string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
     f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-  | Noexpr -> " "
+  | Noexpr -> "Noexpr"
 
 let rec string_of_stmt = function
     Block(stmts) ->

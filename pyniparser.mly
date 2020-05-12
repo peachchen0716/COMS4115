@@ -19,6 +19,7 @@ open Ast
 %token <float> FLIT
 %token <string> STRLIT
 %token <string> ID
+%token NONE
 %token LIST
 %token EOF
 
@@ -97,13 +98,14 @@ expr:
   | BLIT             { BoolLit($1)            }
   | FLIT             { FLit($1)               }
   | STRLIT           { StrLit($1)             }
+  | NONE             { Noexpr                 }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
   | expr TIMES  expr { Binop($1, Mult,  $3)   }
   | expr DIVIDE expr { Binop($1, Div,   $3)   }
   | expr EQ     expr { Binop($1, Equal, $3)   }
-  | expr NEQ    expr { Binop($1, Neq, $3)     }
+  | expr NEQ    expr { Binop($1, Neq,   $3)   }
   | expr LT     expr { Binop($1, Less,  $3)   }
   | expr GT     expr { Binop($1, Greater, $3) }
   | expr LTE    expr { Binop($1, LessEq,  $3) } 
@@ -112,6 +114,7 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3)   }
   | expr INCRE       { Uniop($1, Incre)       }
   | expr DECRE       { Uniop($1, Decre)       }
+  | expr MOD    expr { Binop($1, Mod,   $3)   } 
   | ID ASSIGN expr   { Assign($1, $3)         }
   | LSQUA args_opt RSQUA { ListLit($2) }
   | LPAREN expr RPAREN { $2                   }
