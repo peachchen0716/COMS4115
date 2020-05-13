@@ -162,36 +162,41 @@ let translate (stmts, functions) =
        a StringMap of globale variable name and their value, 
        and a StringMap of local variable name and their value
     *)
-    let rec build_stmt scope glo_table loc_table func_block builder stmt =
+    let rec build_stmt_list scope glo_table loc_table func_block builder stmt_list = 
+        match stmt_list with 
+            | [] -> (builder, glo_table, loc_table)
+            | hd :: tl -> let (b, g, l) = build_stmt scope glo_table loc_table func_block builder hd in 
+                build_stmt_list scope g l func_block b tl
+
+    and build_stmt scope glo_table loc_table func_block builder stmt =
         let add_var m (ty, name) value = 
             L.set_value_name name value;
             let var_addr = L.build_alloca (ltype_of_typ ty) name builder in 
                                        ignore(L.build_store value var_addr builder);
                                        StringMap.add name var_addr m
         in
-        let rec bb_stmt = build_stmt scope glo_table loc_table func_block in
         match stmt with  
-          SBlock sl -> List.fold_left bb_stmt builder sl
+          SBlock sl -> build_stmt_list scope glo_table loc_table func_block builder sl
         | SExpr e -> ignore(build_expr builder glo_table loc_table e); (builder, glo_table, loc_table)
         | SReturn e -> ignore(L.build_ret (build_expr builder glo_table loc_table e) builder); (builder, glo_table, loc_table)
         | SFor (s1, se1, se2, for_body) -> 
-            build_stmt scope glo_table loc_table func_block builder (SBlock [Sexpr s1; SWhile (se1, SBlock [for_body; SExpr se2])])
+            build_stmt scope glo_table loc_table func_block builder (SBlock [s1; SWhile (se1, SBlock [for_body; SExpr se2])])
         | SBindAssign (ty, name, sexpr) -> let expr_val = build_expr builder glo_table loc_table sexpr in 
-                                           if scope then let glo_table = add_var glo_table (ty, name) expr_val in 
+                                           if scope == 1 then let glo_table = add_var glo_table (ty, name) expr_val in 
                                            (builder, glo_table, loc_table)
                                            else (let loc_table = add_var loc_table (ty, name) expr_val in
                                            (builder, glo_table, loc_table))
         | SIf (predicate, then_stmt, else_stmt) ->
             let bool_val = build_expr builder glo_table loc_table predicate in 
             let then_bb = L.append_block context "then" func_block in 
-            ignore(build_stmt scope (L.builder_at_end context then_bb) glo_table loc_table func_block then_stmt);
+            ignore(build_stmt scope  glo_table loc_table func_block (L.builder_at_end context then_bb) then_stmt);
             let else_bb = L.append_block context "else" func_block in 
-            ignore(build_stmt scope (L.builder_at_end context else_bb) glo_table loc_table func_block else_stmt);
+            ignore(build_stmt scope  glo_table loc_table func_block (L.builder_at_end context else_bb) else_stmt);
             let end_bb = L.append_block context "end" func_block in 
             let build_br_end = L.build_br end_bb in
             add_terminal (L.builder_at_end context then_bb) build_br_end;
             add_terminal (L.builder_at_end context else_bb) build_br_end;
-            ignore(L.build_cond_br then_bb else_bb builder);
+            ignore(L.build_cond_br bool_val then_bb else_bb builder);
             ((L.builder_at_end context end_bb), glo_table, loc_table)
         | SWhile (predicate, body) -> 
             let while_bb = L.append_block context "while" func_block in
@@ -199,47 +204,50 @@ let translate (stmts, functions) =
             ignore (build_br_while builder); 
             let while_builder = L.builder_at_end context while_bb in 
             let bool_val = build_expr while_builder glo_table loc_table predicate in 
-            let body_bb = L.append_block context "while_body" func_block in 
-            add_terminal (build_stmt scope (L.builder_at_end context body_bb) glo_table loc_table func_block body) build_br_while;
+            let body_bb = L.append_block context "while_body" func_block in
+            let (loc_builder, _, _) = build_stmt scope glo_table loc_table func_block (L.builder_at_end context body_bb) body in
+            add_terminal loc_builder build_br_while;
             let end_bb = L.append_block context "while_end" func_block in 
             ignore(L.build_cond_br bool_val body_bb end_bb while_builder);
             ((L.builder_at_end context end_bb), glo_table, loc_table)
     in
 
     (* build the main block of pyni *)
-    let build_main main_stmts funcs func_decls= 
+    let build_main main_stmts funcs= 
         (* create the main function *)
         let main : L.lltype = L.var_arg_function_type i1_t [||] in
         let main_func : L.llvalue = L.declare_function "main" main the_module in 
         let main_builder = L.builder_at_end context (L.entry_block main_func) in
 
         let (main_end_builder, global_table, _) = 
-            build_stmt 1 main_builder StringMap.empty StringMap.empty main_func (SBlock main_stmts) 
+            build_stmt 1 StringMap.empty StringMap.empty main_func main_builder (SBlock main_stmts) 
         in
         add_terminal main_end_builder (L.build_ret (L.const_int i1_t 0));
 
         (* Fill in the body of the given function *)
-        let build_function_body func_def func_decls=
-            let (the_function, _) = StringMap.find fdec.sfname func_decls in
+        let build_function_body func_def=
+            let (the_function, _) = StringMap.find func_def.sfname function_decls in
             let f_builder = L.builder_at_end context (L.entry_block the_function) in
             
             (* Build a local symbol table and first fill it with functiob's formals  
              *) 
-            let add_formal m (t, n) p = L.set_value_name n p in
-            let formal = L.build_alloca (ltype_of_typ t) n builder in 
-            ignore (L.build_store p formal builder); StringMap.add n formal m;
+            let add_formal m (t, n) p = 
+                L.set_value_name n p;
+                let formal = L.build_alloca (ltype_of_typ t) n f_builder in 
+                ignore (L.build_store p formal f_builder);
+                StringMap.add n formal m in
 
             let local_table = List.fold_left2 add_formal StringMap.empty func_def.sformals
                           (Array.to_list (L.params the_function)) in
        
-            let (f_end_builder, _, _) = build_stmt 0 f_builder global_table local_table the_function (SBlock func_def.sbody) in 
+            let (f_end_builder, _, _) = build_stmt 0 global_table local_table the_function f_builder (SBlock func_def.sbody) in 
 
             (* Add a return if the last block falls off the end *)
-            add_terminal func_builder (L.build_ret (L.const_int i32_t 0))
+            add_terminal f_end_builder (L.build_ret (L.const_int i32_t 0))
         in
-        List.iter build_function_body funcs func_decls
+        List.iter build_function_body funcs
     in
     
-    build_main stmts functions function_decls;
+    build_main stmts functions ;
     the_module
 
