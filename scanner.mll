@@ -40,7 +40,6 @@ rule token = parse
 | "def"    { DEF }
 | "=="     { EQ }
 | "!="     { NEQ }
-(* not *)
 | '!'      { NOT }
 | '<'      { LT }
 | '>'      { GT }
@@ -61,7 +60,13 @@ rule token = parse
 | "str"    { STRING }
 | "None"   { NONE }
 | "list"   { LIST }
-| digit+ as lem  { LITERAL(int_of_string lem) }
+| "len"    { LEN }
+| "append" { LIST_APPEND }
+| "pop"    { LIST_POP }
+| "insert" { LIST_INSERT }
+| "sort"   { LIST_SORT }
+| "reverse" { LIST_REVERSE }
+| digit+ as lem { LITERAL(int_of_string lem) }
 | digit+ '.' digit* as f { FLIT(float_of_string f) }
 | digit* '.' digit+ as f { FLIT(float_of_string f) }
 | letter (digit | letter | '_')* as lem { ID(lem) }

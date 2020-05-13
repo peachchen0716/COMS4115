@@ -16,6 +16,8 @@ type expr =
   | ListLit of expr list
   | ListAccess of expr * expr
   | ListSlice of expr * expr * expr
+  | Len of expr 
+  | ListPop of expr * expr
   | Uniop of expr * op
   | Binop of expr * op * expr
   | Assign of string * expr
@@ -31,6 +33,12 @@ type stmt =
   | For of stmt * expr * expr * stmt
   | BindAssign of typ * string * expr 
   | Return of expr
+  (* append e2 to list e1 *)
+  | ListAppend of expr * expr
+  (* insert e3 to list e1 at index e2 *)
+  | ListInsert of expr * expr * expr
+  | ListSort of expr
+  | ListReverse of expr
 
 type func_def = {
     rtyp: typ;
@@ -38,6 +46,13 @@ type func_def = {
     formals: bind list;
     body: stmt list;
 }
+
+(*
+type func_sig = {
+    rtyp: typ;
+    formals: typ list;
+}
+*)
 
 type program = stmt list * func_def list
 
@@ -81,6 +96,8 @@ and string_of_expr = function
   | ListAccess(e1, e2) -> string_of_expr e1 ^ "[" ^ string_of_expr e2 ^ "]"
   | ListSlice(e1, e2, e3) -> string_of_expr e1 ^ "[" ^ string_of_expr e2 ^
                              " : " ^ string_of_expr e3 ^ "]"
+  | Len(e) -> "len(" ^ string_of_expr e ^ ")"
+  | ListPop(e1, e2) -> "pop index " ^ string_of_expr e2 ^ " of " ^ string_of_expr e2 
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Uniop(e, o) -> string_of_expr e ^ " " ^ string_of_op o
@@ -103,6 +120,10 @@ let rec string_of_stmt = function
                           string_of_stmt s
   | BindAssign(t, v, e) -> string_of_typ t ^ " " ^ v ^ " = " ^
                            string_of_expr e ^ "\n"
+  | ListAppend(e1, e2) -> "append"
+  | ListInsert(e1, e2, e3) -> "insert"
+  | ListSort(e) -> "sort"
+  | ListReverse(e) -> "reverse"
                                                             
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
                                                                

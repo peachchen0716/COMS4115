@@ -25,6 +25,14 @@ let check (global_stmts, functions) =
   in
 
   (* Collect function declarations for built-in functions: no bodies *)
+  (*
+  let built_in_funcs = [
+    ("print", {rtyp = String; formals = [(String, "x")]});
+    ("upper", {rtyp = String; formals = [(String, "x")]});
+    ("lower", {rtyp = String; formals = [(String, "x")]});
+  ] in
+  *)
+
   let built_in_decls =
     StringMap.add "print" {
       rtyp = Int;
@@ -39,11 +47,19 @@ let check (global_stmts, functions) =
     and dup_err = "duplicate function " ^ fd.fname
     and make_err er = raise (Failure er)
     and n = fd.fname (* Name of the function *)
+    (*
+    and fsig = {rtyp = fd.rtyp, formals = fd.formals}
+    *)
     in match fd with (* No duplicate functions or redefinitions of built-ins *)
       _ when StringMap.mem n built_in_decls -> make_err built_in_err
     | _ when StringMap.mem n map -> make_err dup_err
     | _ ->  StringMap.add n fd map
   in
+
+      (*
+  let built_in_decls = List.fold_left add_func StringMap.empty built_in_funcs 
+  in
+      *)
 
   (* Collect all function names into one symbol table *)
   let function_decls = List.fold_left add_func built_in_decls functions
@@ -119,6 +135,21 @@ let check (global_stmts, functions) =
       else (match lt with
           List t -> (lt, SListSlice(se1, se2, se3))
         | _ -> raise (Failure ("illegal slicing of type " ^ string_of_typ lt)))
+    
+    | Len(e) -> 
+      let (t, _) as se = check_expr e symbols in
+      let err = "illegal len on type " ^ string_of_typ t in
+      (match t with
+        List _ | String -> (Int, SLen se)
+      | _ -> raise (Failure err))
+    (* e1 must be list type, e2 must be int type *)
+    | ListPop(e1, e2) -> 
+      let (lt, _) as se1 = check_expr e1 symbols in
+      let (rt, _) as se2 = check_expr e2 symbols in
+      let err = "illegal list pop on " ^ string_of_expr e1 ^ " at index " ^ string_of_expr e2 in
+      (match lt with
+        List t when rt = Int -> (t, SListPop(se1, se2))
+      | _ -> raise (Failure err))
     | Assign(var, e) as ex ->
       let lt = type_of_identifier var symbols
       and (rt, e') = check_expr e symbols in
@@ -152,6 +183,7 @@ let check (global_stmts, functions) =
         (* Determine expression type based on operator and operand types *)
         let t = match op with
             Add | Sub | Mult | Div when (t1 = Int) || (t1 = Float) -> t1 
+          | Add when t1 = String -> String
           | Mod when t1 = Int -> Int
           | Equal | Neq -> Bool
           | Less | Greater | GreaterEq | LessEq 
@@ -256,7 +288,36 @@ let check (global_stmts, functions) =
       else raise (
           Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                    string_of_typ rtyp ^ " in " ^ string_of_expr e))
-  in 
+    | ListAppend(e1, e2) ->
+      let (lt, _) as se1 = check_expr e1 symbols in
+      let (rt, _) as se2 = check_expr e2 symbols in
+      let err = "illegal append of type " ^ string_of_typ rt ^ "to " ^ string_of_typ lt in
+      (match lt with
+        List t when rt = t -> ( SListAppend(se1, se2), symbols )
+      | _ -> raise (Failure err))
+    | ListInsert(e1, e2, e3) ->
+      let (lt, _) as se1 = check_expr e1 symbols in
+      let (rt1, _) as se2 = check_expr e2 symbols in
+      let (rt2, _) as se3 = check_expr e3 symbols in
+      let err = "illegal insert of type " ^ string_of_typ rt2 ^ " to " ^ string_of_typ lt in
+      (match lt with
+        List t when (rt2 = t) && (rt1 = Int) -> ( SListInsert(se1, se2, se3), symbols )
+      | List t when rt2 = t -> raise (Failure "illegal insert with non int index")
+      | _ -> raise (Failure err))
+    | ListSort(e) ->
+      let (lt, _) as se = check_expr e symbols in
+      let err = "illegal sort of non list type" in
+      (match lt with
+        List _ -> ( SListSort(se), symbols )
+      | _ -> raise (Failure err))
+    | ListReverse(e) ->
+      let (lt, _) as se = check_expr e symbols in
+      let err = "illegal reverse of non list type" in
+      (match lt with
+        List _ -> ( SListReverse(se), symbols )
+      | _ -> raise (Failure err))
+     
+    in 
 
   let global_locals = get_locals global_stmts in 
 

@@ -12,10 +12,11 @@ and sx =
   | SListLit of typ * sexpr list
   | SListAccess of sexpr * sexpr
   | SListSlice of sexpr * sexpr * sexpr
+  | SLen of sexpr
+  | SListPop of sexpr * sexpr
   | SUniop of sexpr * op
   | SBinop of sexpr * op * sexpr
   | SAssign of string * sexpr
-  (* call *)
   | SCall of string * sexpr list
   | SNoexpr
 
@@ -26,8 +27,11 @@ type sstmt =
   | SWhile of sexpr * sstmt
   | SFor of sstmt * sexpr * sexpr * sstmt
   | SBindAssign of typ * string * sexpr
-  (* return *)
   | SReturn of sexpr
+  | SListAppend of sexpr * sexpr
+  | SListInsert of sexpr * sexpr * sexpr
+  | SListSort of sexpr
+  | SListReverse of sexpr
 
 (* func_def: ret_typ fname formals locals body *)
 type sfunc_def = {
@@ -59,6 +63,8 @@ and string_of_sexpr (t, e) =
       | SListSlice(e1, e2, e3) -> 
         string_of_sexpr e1 ^ "[" ^ string_of_sexpr e2 ^ " : " ^ string_of_sexpr e3 ^ "]"
 
+      | SLen(e) -> "len(" ^ string_of_sexpr e ^ ")"
+      | SListPop(e1, e2) -> "pop index " ^ string_of_sexpr e2 ^ " of " ^ string_of_sexpr e1
       | SUniop(e, o) -> string_of_sexpr e ^ " " ^ string_of_op o
       | SBinop(e1, o, e2) ->
         string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
@@ -82,6 +88,10 @@ let rec string_of_sstmt = function
   | SBindAssign(t, v, e) -> string_of_typ t ^ " " ^ v ^ " = " ^
                             string_of_sexpr e ^ "\n"
   | SWhile(e, s) -> "while (" ^ string_of_sexpr e ^ ") " ^ string_of_sstmt s
+  | SListAppend(e1, e2) -> "append"
+  | SListInsert(e1, e2, e3) -> "insert"
+  | SListSort(e) -> "sort"
+  | SListReverse(e) -> "reverse"
 
 let string_of_sfdecl fdecl =
   string_of_typ fdecl.srtyp ^ " " ^

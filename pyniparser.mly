@@ -13,6 +13,8 @@ open Ast
 %token NOELSE
 %token IF ELSE WHILE INT BOOL FLOAT STRING
 %token RETURN COMMA
+%token LEN
+%token LIST_APPEND LIST_POP LIST_INSERT LIST_SORT LIST_REVERSE
 %token <int> LITERAL
 %token <bool> BLIT
 %token <float> FLIT
@@ -29,6 +31,8 @@ open Ast
 %nonassoc ELSE
 %nonassoc LSQUA 
 %nonassoc RSQUA
+%nonassoc LEN
+%nonassoc LIST_APPEND LIST_POP LIST_INSERT LIST_SORT LIST_REVERSE
 
 %left INCRE DECRE NOT
 %right ASSIGN
@@ -94,6 +98,12 @@ stmt:
                                           { For ($3, $4, $6, $8) }
   | typ ID ASSIGN expr SEMI               { BindAssign($1, $2, $4) }
   | RETURN expr SEMI                      { Return $2 }
+  | LIST_APPEND LPAREN expr COMMA expr RPAREN
+                                          { ListAppend($3, $5) }
+  | LIST_INSERT LPAREN expr COMMA expr COMMA  expr RPAREN
+                                          { ListInsert($3, $5, $7) }
+  | LIST_SORT LPAREN expr RPAREN          { ListSort($3) }
+  | LIST_REVERSE LPAREN expr RPAREN       { ListReverse($3) }
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -126,6 +136,10 @@ expr:
   | LSQUA args_opt RSQUA 
                      { ListLit($2) }
   | list_access      { $1 }
+  | LEN LPAREN expr RPAREN
+                     { Len($3) }
+  | LIST_POP LPAREN expr COMMA expr RPAREN 
+                     { ListPop($3, $5) }
   | LPAREN expr RPAREN 
                      { $2 }
   | ID LPAREN args_opt RPAREN 
