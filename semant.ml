@@ -110,7 +110,15 @@ let check (global_stmts, functions) =
       else (match lt with
           List t -> (t, SListAccess(se1, se2))
         | _ -> raise (Failure ("illegal indexing of type " ^ string_of_typ lt)))
-    | ListSlice(e1, e2, e3) -> raise (Failure ("not implemented"))
+    | ListSlice(e1, e2, e3) ->  
+      let (lt, _) as se1 = check_expr e1 symbols in
+      let (rt1, _) as se2 = check_expr e2 symbols in
+      let (rt2, _) as se3 = check_expr e3 symbols in
+      if (rt1 <> Int) || (rt2 <> Int) 
+      then raise (Failure ("illegal list slice type " ^ string_of_typ rt1 ^ " : " ^ string_of_typ rt2))
+      else (match lt with
+          List t -> (lt, SListSlice(se1, se2, se3))
+        | _ -> raise (Failure ("illegal slicing of type " ^ string_of_typ lt)))
     | Assign(var, e) as ex ->
       let lt = type_of_identifier var symbols
       and (rt, e') = check_expr e symbols in
@@ -143,9 +151,11 @@ let check (global_stmts, functions) =
       if t1 = t2 then
         (* Determine expression type based on operator and operand types *)
         let t = match op with
-            Add | Sub when t1 = Int -> Int
+            Add | Sub | Mult | Div when (t1 = Int) || (t1 = Float) -> t1 
+          | Mod when t1 = Int -> Int
           | Equal | Neq -> Bool
-          | Less when t1 = Int -> Bool
+          | Less | Greater | GreaterEq | LessEq 
+            when (t1 = Int) || (t1 = Float) -> Bool
           | And | Or when t1 = Bool -> Bool
           | _ -> raise (Failure err)
         in
