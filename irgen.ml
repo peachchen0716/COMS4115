@@ -95,15 +95,16 @@ let translate (stmts, functions) =
 		  	  	in 
 		  	  	let old_ptr = lookup var_name in 
 		  	  	let _ = L.build_store tmp old_ptr builder in tmp
-		  	
+		  	  | A.Not   -> L.build_not e' "uniop" builder  		  	
 		| SBinop (se1, op, se2)      ->
 			let match_fop op = match op with 
 				  A.Add      -> L.build_fadd 
 				| A.Sub      -> L.build_fsub
 				| A.Mult     -> L.build_fmul
 				| A.Div      -> L.build_fdiv
+				| A.Mod      -> L.build_srem
 				| A.Equal    -> L.build_fcmp L.Fcmp.Oeq
-				| A.Neq      -> L.build_fcmp L.Fcmp. One
+				| A.Neq      -> L.build_fcmp L.Fcmp.One
 				| A.Less     -> L.build_fcmp L.Fcmp.Olt
 				| A.Greater  -> L.build_fcmp L.Fcmp.Ogt
 				| A.GreateEq -> L.build_fcmp L.Fcmp.Oge
@@ -115,7 +116,7 @@ let translate (stmts, functions) =
 				let e1' = build_expr builder glo_table loc_table se1 
 				and e2' = build_expr builder glo_table loc_table se2 in
 				(match_fop op) e1' e2' "float_binop" builder	
-			(* binop for others *)				
+			(* binop between others *)				
 			else 
 				let e1' = build_expr builder glo_table loc_table se1 and e2' = build_expr builder glo_table loc_table se2 
 				in
@@ -165,12 +166,13 @@ let translate (stmts, functions) =
 	    let add_var m (ty, name) val = let var_addr = L.build_alloca (ltype_of_typ ty) name builder in 
 	    							   ignore(L.build_store val var_addr builder); 
 	    							   StringMap.add name var_addr m
-			 
+		in	 
 		match stmt with  
 		  SBlock sl -> List.fold_left build_stmt scope builder glo_table loc_table sl
 		| SExpr e -> ignore(build_expr builder glo_table loc_table e); (builder, glo_table, loc_table) 
 		| SReturn e -> ignore(L.build_ret (build_expr builder glo_table loc_table e) builder); (builder, glo_table, loc_table)
-		| SFor (var_decl, predicate, op_expr, stmt) -> (* TODO *)
+		| SFor (s1, se1, se2, for_body) -> 
+			build_stmt scope builder glo_table loc_table func_block (SBlock [Sexpr s1; SWhile (se1, SBlock [for_body; SExpr se2])])
 		| SBindAssign (ty, name, sexpr) -> let expr_val = build_expr builder glo_table loc_table sexpr in 
 										   if scope then let glo_table = add_var glo_table (ty, name) expr_val in 
 										   (builder, glo_table, loc_table)
