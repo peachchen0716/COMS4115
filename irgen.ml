@@ -57,7 +57,7 @@ let translate (stmts, functions) =
 			in List.fold_left function_decl StringMap.empty functions 
 	in
 
-	let rec build_sexpr builder glo_table loc_table ((_, e): sexpr) = 
+	let rec build_expr builder glo_table loc_table ((_, e): sexpr) = 
 		let lookup name = try StringMap.find name loc_table 
 						  with Not_found -> 
 						  	try StringMap.find name glo_table
@@ -87,7 +87,7 @@ let translate (stmts, functions) =
           		| _ -> raise (Failure ("illegal list slice arguments")) 
        		in
        		let _ = L.build_call ((StringMap.find (type_str list_type)) list_slice) [| (lookup id); new_list_ptr; fst e'; snd e' |] "" builder 
-       		in
+       		ein
        		L.build_load new_list_ptr "new_list" builder
     	| SListFind (list_type, id, e) ->
       		L.build_call (StringMap.find (type_str list_type) list_find) [| (lookup id); (expr builder e) |] "list_find" builder
