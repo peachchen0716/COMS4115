@@ -75,6 +75,22 @@ let translate (stmts, functions) =
 		| SAssign (s, se) -> 
 			let e' = build_expr builder glo_table loc_table se in 
 			ignore(L.build_store e' (lookup s) builder); e'
+		| SListSlice (list_type, id, e1, e2) ->
+       		let ltype = (ltype_of_typ list_type) in
+       		let new_list_ptr = L.build_alloca (list_t ltype) "new_list_ptr" builder in
+       		let _ = init_list builder new_list_ptr list_type in
+       		let e' = match (fst e1, fst e2) with
+           		(A.Int, A.Int) -> (expr builder e1, expr builder e2)
+          		| (A.Void, A.Int) -> (L.const_int i32_t 0, expr builder e2)
+          		| (A.Int, A.Void) ->  (expr builder e1, L.build_sub (expr builder (A.Int, SListSize(list_type, id))) (L.const_int i32_t 1) "size_min_one" builder)
+          		| (A.Void, A.Void) -> (L.const_int i32_t 0, L.build_sub (expr builder (A.Int, SListSize(list_type, id))) (L.const_int i32_t 1) "size_min_one" builder)
+          		| _ -> raise (Failure ("illegal list slice arguments")) 
+       		in
+       		let _ = L.build_call ((StringMap.find (type_str list_type)) list_slice) [| (lookup id); new_list_ptr; fst e'; snd e' |] "" builder 
+       		in
+       		L.build_load new_list_ptr "new_list" builder
+    	| SListFind (list_type, id, e) ->
+      		L.build_call (StringMap.find (type_str list_type) list_find) [| (lookup id); (expr builder e) |] "list_find" builder
 		| SUniop (se, op) -> 
 			let e' = build_expr builder glo_table loc_table se 
 			and one = L.const_int i32_t 1 in
