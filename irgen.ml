@@ -23,7 +23,7 @@ let translate (stmts, functions) =
     let i32_t     = L.i32_type context
     and i8_t      = L.i8_type context
     and i1_t      = L.i1_type context
-    and float_t   = L.float_t context
+    and float_t   = L.double_type context
     and str_t     = L.pointer_type (L.i8_type context)
     and list_t t  = L.struct_type context [|L.pointer_type (L.i32_type context); L.pointer_type t|]
     in
@@ -51,25 +51,24 @@ let translate (stmts, functions) =
         let funciton_decl m func_def = 
             let f_name = func_def.sfname
             and formal_types = 
-                Array.of_list (List.map (fun (ty,_) -> ltype_of_typ t) func_def.sformals)
-            in let f_type = L.function_type (ltype_of_typ fedcl.srtyp) formal_types in 
+                Array.of_list (List.map (fun (ty,_) -> ltype_of_typ ty) func_def.sformals)
+            in let f_type = L.function_type (ltype_of_typ func_def.srtyp) formal_types in 
             StringMap.add f_name (L.define_function f_name f_type the_module, func_def) m
-            in List.fold_left function_decl StringMap.empty functions 
+            in List.fold_left funciton_decl StringMap.empty functions 
     in
 
     let rec build_expr builder glo_table loc_table ((_, e): sexpr) = 
         let lookup name = try StringMap.find name loc_table 
                           with Not_found -> 
                             try StringMap.find name glo_table
-                            with Not_found -> raise (Failure("variabel "^name" not declared."))
+                            with Not_found -> raise (Failure("variable not declared."))
         in 
         match e with 
           SLiteral i -> L.const_int i32_t i 
         | SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
         | SFLit f    -> L.const_float float_t f
         | SStrLit s  -> L.build_global_stringptr (s^"\x00") "strptr" builder
-        | SNone      -> L.const_int i1_t 0
-        | SListLit l -> L.build_ptr
+        | SNoexpr      -> L.const_int i1_t 0
         | SId s      -> L.build_load (lookup s) s builder
         | SNoexpr    -> L.const_int i32_t 0
         | SAssign (s, se) -> 
@@ -79,7 +78,7 @@ let translate (stmts, functions) =
         | SUniop (se, op) -> 
             let e' = build_expr builder glo_table loc_table se 
             and one = L.const_int i32_t 1 in
-            match op with 
+            (match op with 
                 A.Incre -> 
                     let tmp = L.build_add e' one "uniop" builder in 
                     let var_name = match (snd se) with 
@@ -96,8 +95,8 @@ let translate (stmts, functions) =
                 in 
                 let old_ptr = lookup var_name in 
                 let _ = L.build_store tmp old_ptr builder in tmp
-              | A.Not   -> L.build_not e' "uniop" builder           
-        | SBinop (se1, op, se2)      ->
+              | A.Not   -> L.build_not e' "uniop" builder)          
+        | SBinop (se1, op, se2) ->
             let match_fop op = match op with 
                   A.Add      -> L.build_fadd 
                 | A.Sub      -> L.build_fsub
@@ -108,7 +107,7 @@ let translate (stmts, functions) =
                 | A.Neq      -> L.build_fcmp L.Fcmp.One
                 | A.Less     -> L.build_fcmp L.Fcmp.Olt
                 | A.Greater  -> L.build_fcmp L.Fcmp.Ogt
-                | A.GreateEq -> L.build_fcmp L.Fcmp.Oge
+                | A.GreaterEq -> L.build_fcmp L.Fcmp.Oge
                 | A.LessEq   -> L.build_fcmp L.Fcmp.Ole
                 | _          -> raise (Failure "And & Or operation not allowed on float type")
             in
@@ -133,7 +132,7 @@ let translate (stmts, functions) =
                     | A.Neq     -> L.build_icmp L.Icmp.Ne
                     | A.Less    -> L.build_icmp L.Icmp.Slt
                     | A.Greater -> L.build_icmp L.Icmp.Sgt
-                    | A.GreateEq     -> L.build_icmp L.Icmp.Sle                 
+                    | A.GreaterEq     -> L.build_icmp L.Icmp.Sle                 
                     | A.LessEq     -> L.build_icmp L.Icmp.Sge
                 ) e1' e2' "normal_binop" builder
         | SCall ("printf", [e]) ->
@@ -163,17 +162,20 @@ let translate (stmts, functions) =
        a StringMap of globale variable name and their value, 
        and a StringMap of local variable name and their value
     *)
-    let rec build_stmt scope builder scope glo_table loc_table func_block stmt =
-        let add_var m (ty, name) val = let var_addr = L.build_alloca (ltype_of_typ ty) name builder in 
-                                       ignore(L.build_store val var_addr builder);
+    let rec build_stmt scope glo_table loc_table func_block builder stmt =
+        let add_var m (ty, name) value = 
+            L.set_value_name name value;
+            let var_addr = L.build_alloca (ltype_of_typ ty) name builder in 
+                                       ignore(L.build_store value var_addr builder);
                                        StringMap.add name var_addr m
-        in   
+        in
+        let rec bb_stmt = build_stmt scope glo_table loc_table func_block in
         match stmt with  
-          SBlock sl -> List.fold_left build_stmt scope builder glo_table loc_table sl
-        | SExpr e -> ignore(build_expr builder glo_table loc_table e); (builder, glo_table, loc_table) 
+          SBlock sl -> List.fold_left bb_stmt builder sl
+        | SExpr e -> ignore(build_expr builder glo_table loc_table e); (builder, glo_table, loc_table)
         | SReturn e -> ignore(L.build_ret (build_expr builder glo_table loc_table e) builder); (builder, glo_table, loc_table)
         | SFor (s1, se1, se2, for_body) -> 
-            build_stmt scope builder glo_table loc_table func_block (SBlock [Sexpr s1; SWhile (se1, SBlock [for_body; SExpr se2])])
+            build_stmt scope glo_table loc_table func_block builder (SBlock [Sexpr s1; SWhile (se1, SBlock [for_body; SExpr se2])])
         | SBindAssign (ty, name, sexpr) -> let expr_val = build_expr builder glo_table loc_table sexpr in 
                                            if scope then let glo_table = add_var glo_table (ty, name) expr_val in 
                                            (builder, glo_table, loc_table)
@@ -182,9 +184,9 @@ let translate (stmts, functions) =
         | SIf (predicate, then_stmt, else_stmt) ->
             let bool_val = build_expr builder glo_table loc_table predicate in 
             let then_bb = L.append_block context "then" func_block in 
-            ignore(build_stmt scope (L.builder_at_end context then_bb) glo_table loc_table func_block then_stmt)
+            ignore(build_stmt scope (L.builder_at_end context then_bb) glo_table loc_table func_block then_stmt);
             let else_bb = L.append_block context "else" func_block in 
-            ignore(build_stmt scope (L.builder_at_end context else_bb) glo_table loc_table func_block else_stmt) in 
+            ignore(build_stmt scope (L.builder_at_end context else_bb) glo_table loc_table func_block else_stmt);
             let end_bb = L.append_block context "end" func_block in 
             let build_br_end = L.build_br end_bb in
             add_terminal (L.builder_at_end context then_bb) build_br_end;
@@ -223,12 +225,12 @@ let translate (stmts, functions) =
             
             (* Build a local symbol table and first fill it with functiob's formals  
              *) 
-            let add_formal m (t, n) p = L.set_value_name n p;
+            let add_formal m (t, n) p = L.set_value_name n p in
             let formal = L.build_alloca (ltype_of_typ t) n builder in 
-            ignore (L.build_store p formal builder); StringMap.add n formal m
+            ignore (L.build_store p formal builder); StringMap.add n formal m;
 
             let local_table = List.fold_left2 add_formal StringMap.empty func_def.sformals
-                          (Array.to_list (L.params the_function))
+                          (Array.to_list (L.params the_function)) in
        
             let (f_end_builder, _, _) = build_stmt 0 f_builder global_table local_table the_function (SBlock func_def.sbody) in 
 
