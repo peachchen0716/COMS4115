@@ -24,6 +24,7 @@ let translate (stmts, functions) =
     and i8_t      = L.i8_type context
     and i1_t      = L.i1_type context
     and float_t   = L.double_type context
+    and none_t    = L.void_type   context
     and str_t     = L.pointer_type (L.i8_type context)
     and list_t t  = L.struct_type context [|L.pointer_type (L.i32_type context); L.pointer_type t|]
     in
@@ -33,7 +34,7 @@ let translate (stmts, functions) =
         | A.Bool -> i1_t
         | A.Float -> float_t
         | A.String -> str_t
-        | A.None -> i1_t
+        | A.None -> none_t
         | A.List t -> list_t (ltype_of_typ t)
     in 
 
@@ -56,21 +57,22 @@ let translate (stmts, functions) =
             StringMap.add f_name (L.define_function f_name f_type the_module, func_def) m
             in List.fold_left funciton_decl StringMap.empty functions 
     in
-
+    
     let rec build_expr builder glo_table loc_table ((_, e): sexpr) = 
         let lookup name = try StringMap.find name loc_table 
                           with Not_found -> 
                             try StringMap.find name glo_table
                             with Not_found -> raise (Failure("variable not declared."))
         in 
+        let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+
         match e with 
           SLiteral i -> L.const_int i32_t i 
         | SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
         | SFLit f    -> L.const_float float_t f
         | SStrLit s  -> L.build_global_stringptr (s^"\x00") "strptr" builder
-        | SNoexpr      -> L.const_int i1_t 0
+        | SNoexpr    -> L.const_int i1_t 0
         | SId s      -> L.build_load (lookup s) s builder
-        | SNoexpr    -> L.const_int i32_t 0
         | SAssign (s, se) -> 
             let e' = build_expr builder glo_table loc_table se in 
             ignore(L.build_store e' (lookup s) builder); e'
@@ -135,8 +137,8 @@ let translate (stmts, functions) =
                     | A.GreaterEq     -> L.build_icmp L.Icmp.Sle                 
                     | A.LessEq     -> L.build_icmp L.Icmp.Sge
                 ) e1' e2' "normal_binop" builder
-        | SCall ("printf", [e]) ->
-            L.build_call printf_func [|(L.build_global_stringptr "%d\n" "fmt" builder) ; (build_expr builder glo_table loc_table e)|]
+        | SCall ("print", [e]) ->
+            L.build_call printf_func [| int_format_str ; (build_expr builder glo_table loc_table e)|]
             "printf" builder
         | SCall (f, args) -> 
             let (fdef, func_def) = StringMap.find f function_decls in 
@@ -171,7 +173,7 @@ let translate (stmts, functions) =
     and build_stmt scope glo_table loc_table func_block builder stmt =
         let add_var m (ty, name) value = 
             L.set_value_name name value;
-            let var_addr = L.build_alloca (ltype_of_typ ty) name builder in 
+            let var_addr = L.build_alloca (ltype_of_typ ty) name builder in
                                        ignore(L.build_store value var_addr builder);
                                        StringMap.add name var_addr m
         in
@@ -181,7 +183,7 @@ let translate (stmts, functions) =
         | SReturn e -> ignore(L.build_ret (build_expr builder glo_table loc_table e) builder); (builder, glo_table, loc_table)
         | SFor (s1, se1, se2, for_body) -> 
             build_stmt scope glo_table loc_table func_block builder (SBlock [s1; SWhile (se1, SBlock [for_body; SExpr se2])])
-        | SBindAssign (ty, name, sexpr) -> let expr_val = build_expr builder glo_table loc_table sexpr in 
+        | SBindAssign (ty, name, sexpr) -> let expr_val = build_expr builder glo_table loc_table sexpr in
                                            if scope == 1 then let glo_table = add_var glo_table (ty, name) expr_val in 
                                            (builder, glo_table, loc_table)
                                            else (let loc_table = add_var loc_table (ty, name) expr_val in
@@ -215,14 +217,14 @@ let translate (stmts, functions) =
     (* build the main block of pyni *)
     let build_main main_stmts funcs= 
         (* create the main function *)
-        let main : L.lltype = L.var_arg_function_type i1_t [||] in
-        let main_func : L.llvalue = L.declare_function "main" main the_module in 
+        let main : L.lltype = L.function_type i32_t [||] in
+        let main_func : L.llvalue = L.define_function "main" main the_module in 
         let main_builder = L.builder_at_end context (L.entry_block main_func) in
 
         let (main_end_builder, global_table, _) = 
-            build_stmt 1 StringMap.empty StringMap.empty main_func main_builder (SBlock main_stmts) 
+            build_stmt 1 StringMap.empty StringMap.empty main_func main_builder (SBlock main_stmts);
         in
-        add_terminal main_end_builder (L.build_ret (L.const_int i1_t 0));
+        add_terminal main_end_builder (L.build_ret (L.const_int i32_t 0));
 
         (* Fill in the body of the given function *)
         let build_function_body func_def=
@@ -247,7 +249,7 @@ let translate (stmts, functions) =
         in
         List.iter build_function_body funcs
     in
-    
-    build_main stmts functions ;
+
+    build_main stmts functions;
     the_module
 
