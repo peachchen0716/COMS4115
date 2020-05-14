@@ -119,12 +119,12 @@ let check (global_stmts, functions) =
     | ListLit lst -> 
       let (t, slst) = check_list lst symbols in 
       (List(t), SListLit(t, slst))
-    | ListAccess(e1, e2) ->
-      let (lt, _) as se1 = check_expr e1 symbols in
-      let (rt, _) as se2 = check_expr e2 symbols in
+    | ListAccess(lname, e) ->
+      let lt as se1 = type_of_identifier lname symbols in
+      let (rt, _) as se = check_expr e symbols in
       if rt <> Int then raise (Failure ("illegal list index of type " ^ string_of_typ rt))
       else (match lt with
-          List t -> (t, SListAccess(se1, se2))
+          List t -> (t, SListAccess(lt, lname, se))
         | _ -> raise (Failure ("illegal indexing of type " ^ string_of_typ lt)))
     | ListSlice(e1, e2, e3) ->  
       let (lt, _) as se1 = check_expr e1 symbols in

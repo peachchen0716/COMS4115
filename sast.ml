@@ -10,7 +10,7 @@ and sx =
   | SStrLit of string
   | SId of string
   | SListLit of typ * sexpr list
-  | SListAccess of sexpr * sexpr
+  | SListAccess of typ * string * sexpr
   | SListSlice of sexpr * sexpr * sexpr
   | SLen of sexpr
   | SListPop of sexpr * sexpr
@@ -59,7 +59,7 @@ and string_of_sexpr (t, e) =
       | SStrLit(s) -> s
       | SId(s) -> s
       | SListLit(_, lst) -> "[ " ^ string_of_slist lst ^ " ]"
-      | SListAccess(e1, e2) -> string_of_sexpr e1 ^ "[" ^ string_of_sexpr e2 ^ "]"
+      | SListAccess(t, s, e2) -> string_of_typ t ^ " " ^ s ^ "[" ^ string_of_sexpr e2 ^ "]"
       | SListSlice(e1, e2, e3) -> 
         string_of_sexpr e1 ^ "[" ^ string_of_sexpr e2 ^ " : " ^ string_of_sexpr e3 ^ "]"
 

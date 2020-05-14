@@ -27,6 +27,7 @@ open Ast
 %start program
 %type <Ast.program> program
 
+%nonassoc ID
 %nonassoc NOELSE
 %nonassoc ELSE
 %nonassoc LSQUA 
@@ -146,7 +147,7 @@ expr:
                      { Call ($1, $3) }
 
 list_access:
-  | expr LSQUA expr RSQUA { ListAccess($1, $3) }
+  | ID LSQUA expr RSQUA { ListAccess($1, $3) }
   | expr LSQUA expr COLON expr RSQUA { ListSlice($1, $3, $5) }
 
 args_opt:

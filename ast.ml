@@ -14,7 +14,7 @@ type expr =
   | StrLit of string
   | Id of string
   | ListLit of expr list
-  | ListAccess of expr * expr
+  | ListAccess of string * expr
   | ListSlice of expr * expr * expr
   | Len of expr 
   | ListPop of expr * expr
@@ -93,7 +93,7 @@ and string_of_expr = function
   | StrLit(s) -> s
   | Id(s) -> s
   | ListLit(lst) -> "[ " ^ string_of_list lst ^ " ]"
-  | ListAccess(e1, e2) -> string_of_expr e1 ^ "[" ^ string_of_expr e2 ^ "]"
+  | ListAccess(s, e) -> "list " ^ s ^ "[" ^ string_of_expr e ^ "]"
   | ListSlice(e1, e2, e3) -> string_of_expr e1 ^ "[" ^ string_of_expr e2 ^
                              " : " ^ string_of_expr e3 ^ "]"
   | Len(e) -> "len(" ^ string_of_expr e ^ ")"
