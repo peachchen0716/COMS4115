@@ -137,7 +137,7 @@ expr:
   | LSQUA args_opt RSQUA 
                      { ListLit($2) }
   | list_access      { $1 }
-  | LEN LPAREN expr RPAREN
+  | LEN LPAREN ID RPAREN
                      { Len($3) }
   | LIST_POP LPAREN expr COMMA expr RPAREN 
                      { ListPop($3, $5) }

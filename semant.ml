@@ -136,11 +136,11 @@ let check (global_stmts, functions) =
           List t -> (lt, SListSlice(se1, se2, se3))
         | _ -> raise (Failure ("illegal slicing of type " ^ string_of_typ lt)))
     
-    | Len(e) -> 
-      let (t, _) as se = check_expr e symbols in
+    | Len(s) -> 
+      let t = type_of_identifier s symbols in
       let err = "illegal len on type " ^ string_of_typ t in
       (match t with
-        List _ | String -> (Int, SLen se)
+        List _ | String -> (Int, SLen s)
       | _ -> raise (Failure err))
     (* e1 must be list type, e2 must be int type *)
     | ListPop(e1, e2) -> 

@@ -16,7 +16,8 @@ type expr =
   | ListLit of expr list
   | ListAccess of string * expr
   | ListSlice of expr * expr * expr
-  | Len of expr 
+  (* TODO: change to Len of expr if time allows *)
+  | Len of string 
   | ListPop of expr * expr
   | Uniop of expr * op
   | Binop of expr * op * expr
@@ -96,7 +97,7 @@ and string_of_expr = function
   | ListAccess(s, e) -> "list " ^ s ^ "[" ^ string_of_expr e ^ "]"
   | ListSlice(e1, e2, e3) -> string_of_expr e1 ^ "[" ^ string_of_expr e2 ^
                              " : " ^ string_of_expr e3 ^ "]"
-  | Len(e) -> "len(" ^ string_of_expr e ^ ")"
+  | Len(s) -> "len(" ^ s ^ ")"
   | ListPop(e1, e2) -> "pop index " ^ string_of_expr e2 ^ " of " ^ string_of_expr e2 
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
