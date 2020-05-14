@@ -99,7 +99,7 @@ stmt:
                                           { For ($3, $4, $6, $8) }
   | typ ID ASSIGN expr SEMI               { BindAssign($1, $2, $4) }
   | RETURN expr SEMI                      { Return $2 }
-  | LIST_APPEND LPAREN ID COMMA expr RPAREN
+  | LIST_APPEND LPAREN ID COMMA expr RPAREN SEMI
                                           { ListAppend($3, $5) }
   | LIST_INSERT LPAREN expr COMMA expr COMMA  expr RPAREN
                                           { ListInsert($3, $5, $7) }
