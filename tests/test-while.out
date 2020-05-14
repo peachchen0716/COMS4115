@@ -9,28 +9,54 @@ source_filename = "Pyni"
 @fmt.5 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @fmt.6 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @fmt.7 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.8 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.9 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.10 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.11 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.12 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.13 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.14 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.15 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 
 declare i32 @printf(i8*, ...)
 
 define i32 @main() {
 entry:
-  %b = alloca i32
-  store i32 5, i32* %b
+  %a = alloca i32
+  store i32 0, i32* %a
   br label %while
 
 while:                                            ; preds = %while_body, %entry
-  %b1 = load i32, i32* %b
-  %normal_binop = icmp sge i32 %b1, 0
+  %a1 = load i32, i32* %a
+  %normal_binop = icmp slt i32 %a1, 5
   br i1 %normal_binop, label %while_body, label %while_end
 
 while_body:                                       ; preds = %while
-  %b2 = load i32, i32* %b
-  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.4, i32 0, i32 0), i32 %b2)
-  %b3 = load i32, i32* %b
-  %uniop = sub i32 %b3, 1
-  store i32 %uniop, i32* %b
+  %a2 = load i32, i32* %a
+  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.4, i32 0, i32 0), i32 %a2)
+  %a3 = load i32, i32* %a
+  %uniop = add i32 %a3, 1
+  store i32 %uniop, i32* %a
   br label %while
 
 while_end:                                        ; preds = %while
+  %b = alloca i32
+  store i32 5, i32* %b
+  br label %while4
+
+while4:                                           ; preds = %while_body7, %while_end
+  %b5 = load i32, i32* %b
+  %normal_binop6 = icmp sge i32 %b5, 0
+  br i1 %normal_binop6, label %while_body7, label %while_end12
+
+while_body7:                                      ; preds = %while4
+  %b8 = load i32, i32* %b
+  %printf9 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.12, i32 0, i32 0), i32 %b8)
+  %b10 = load i32, i32* %b
+  %uniop11 = sub i32 %b10, 1
+  store i32 %uniop11, i32* %b
+  br label %while4
+
+while_end12:                                      ; preds = %while4
   ret i32 0
 }

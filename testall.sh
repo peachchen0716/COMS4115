@@ -93,7 +93,7 @@ Check() {
     
     generatedfiles="$generatedfiles ${basename}.out" &&
     
-    Run "$PYNI" "$1" ">" "${basename}.out" &&
+    Run "$PYNI -l" "$1" ">" "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
     # Run "$PYNI" "$1" ">" "${basename}.ll" &&
