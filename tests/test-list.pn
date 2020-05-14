@@ -1,0 +1,7 @@
+list<int> a = [1, 2, 3];
+print(a[2]);
+print(len(a));
+pop(a);
+print(len(a));
+append(a, 3);
+print(len(a));
