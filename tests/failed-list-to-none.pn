@@ -1,0 +1,4 @@
+# assign None to list 
+# this should fail
+
+list<int> a = None; 

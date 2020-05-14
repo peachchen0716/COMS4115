@@ -7,6 +7,43 @@ source_filename = "Pyni"
 @fmt.3 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @fmt.4 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @fmt.5 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.6 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.7 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.8 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.9 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.10 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.11 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.12 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.13 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.14 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.15 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.16 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.17 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.18 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.19 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.20 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.21 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.22 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.23 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.24 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.25 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.26 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.27 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.28 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.29 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.30 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.31 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.32 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.33 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.34 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.35 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.36 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.37 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.38 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.39 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.40 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.41 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.42 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 
 declare i32 @printf(i8*, ...)
 
@@ -262,20 +299,73 @@ entry:
   ret i8* %list_arry_next_element
 }
 
-define double @foo(double %x, double %y) {
-entry:
-  %x1 = alloca double
-  store double %x, double* %x1
-  %y2 = alloca double
-  store double %y, double* %y2
-  %x3 = load double, double* %x1
-  %y4 = load double, double* %y2
-  %float_binop = fadd double %x3, %y4
-  ret double %float_binop
-}
-
 define i32 @main() {
 entry:
-  %foo_result = call double @foo(double 3.000000e+00, double 4.000000e+00)
+  %a = alloca double
+  store double 3.000000e+00, double* %a
+  %a1 = load double, double* %a
+  %float_binop = fcmp oeq double %a1, 3.000000e+00
+  br i1 %float_binop, label %then, label %else
+
+then:                                             ; preds = %entry
+  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.6, i32 0, i32 0), i32 1)
+  br label %end
+
+else:                                             ; preds = %entry
+  %printf2 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.8, i32 0, i32 0), i32 0)
+  br label %end
+
+end:                                              ; preds = %else, %then
+  %b = alloca double
+  store double -5.000000e+00, double* %b
+  %b3 = load double, double* %b
+  %float_binop4 = fcmp oeq double %b3, -5.000000e+00
+  br i1 %float_binop4, label %then5, label %else7
+
+then5:                                            ; preds = %end
+  %printf6 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.16, i32 0, i32 0), i32 1)
+  br label %end9
+
+else7:                                            ; preds = %end
+  %printf8 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.18, i32 0, i32 0), i32 0)
+  br label %end9
+
+end9:                                             ; preds = %else7, %then5
+  %c = alloca double
+  store double 6.660000e+01, double* %c
+  %c10 = load double, double* %c
+  %float_binop11 = fcmp oeq double %c10, 6.660000e+01
+  br i1 %float_binop11, label %then12, label %else14
+
+then12:                                           ; preds = %end9
+  %printf13 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.26, i32 0, i32 0), i32 1)
+  br label %end16
+
+else14:                                           ; preds = %end9
+  %printf15 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.28, i32 0, i32 0), i32 0)
+  br label %end16
+
+end16:                                            ; preds = %else14, %then12
+  %d = alloca double
+  store double 1.200000e+01, double* %d
+  %e = alloca double
+  store double 2.000000e+00, double* %e
+  %d17 = load double, double* %d
+  %e18 = load double, double* %e
+  %float_binop19 = fdiv double %d17, %e18
+  store double %float_binop19, double* %e
+  %e20 = load double, double* %e
+  %float_binop21 = fcmp oeq double %e20, 6.000000e+00
+  br i1 %float_binop21, label %then22, label %else24
+
+then22:                                           ; preds = %end16
+  %printf23 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.39, i32 0, i32 0), i32 1)
+  br label %end26
+
+else24:                                           ; preds = %end16
+  %printf25 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.41, i32 0, i32 0), i32 0)
+  br label %end26
+
+end26:                                            ; preds = %else24, %then22
   ret i32 0
 }

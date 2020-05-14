@@ -1,0 +1,31 @@
+# addition on int
+int a = 1 + 2;
+print(a);
+
+# incre on int 
+a++;
+print(a);
+
+# decre on int
+a--;
+print(a);
+
+# subtract on int 
+int b = -10 + 5;
+print(b);
+
+# times on int 
+int c = 11 * 6;
+print(c);
+
+# divide on int 
+int d = 12;
+int e = 2;
+e = d / e;
+print(e);
+
+# mod on int 
+int f = 13 % 6;
+print(f);
+
+

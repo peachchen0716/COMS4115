@@ -1,0 +1,5 @@
+def print_inside(): int {
+	print(88);
+}
+
+print_inside();

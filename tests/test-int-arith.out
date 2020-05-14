@@ -7,6 +7,36 @@ source_filename = "Pyni"
 @fmt.3 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @fmt.4 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @fmt.5 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.6 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.7 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.8 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.9 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.10 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.11 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.12 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.13 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.14 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.15 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.16 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.17 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.18 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.19 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.20 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.21 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.22 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.23 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.24 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.25 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.26 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.27 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.28 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.29 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.30 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.31 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.32 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.33 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.34 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.35 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 
 declare i32 @printf(i8*, ...)
 
@@ -262,20 +292,43 @@ entry:
   ret i8* %list_arry_next_element
 }
 
-define double @foo(double %x, double %y) {
-entry:
-  %x1 = alloca double
-  store double %x, double* %x1
-  %y2 = alloca double
-  store double %y, double* %y2
-  %x3 = load double, double* %x1
-  %y4 = load double, double* %y2
-  %float_binop = fadd double %x3, %y4
-  ret double %float_binop
-}
-
 define i32 @main() {
 entry:
-  %foo_result = call double @foo(double 3.000000e+00, double 4.000000e+00)
+  %a = alloca i32
+  store i32 3, i32* %a
+  %a1 = load i32, i32* %a
+  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.3, i32 0, i32 0), i32 %a1)
+  %a2 = load i32, i32* %a
+  %uniop = add i32 %a2, 1
+  store i32 %uniop, i32* %a
+  %a3 = load i32, i32* %a
+  %printf4 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.7, i32 0, i32 0), i32 %a3)
+  %a5 = load i32, i32* %a
+  %uniop6 = sub i32 %a5, 1
+  store i32 %uniop6, i32* %a
+  %a7 = load i32, i32* %a
+  %printf8 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.11, i32 0, i32 0), i32 %a7)
+  %b = alloca i32
+  store i32 -5, i32* %b
+  %b9 = load i32, i32* %b
+  %printf10 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.16, i32 0, i32 0), i32 %b9)
+  %c = alloca i32
+  store i32 66, i32* %c
+  %c11 = load i32, i32* %c
+  %printf12 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.21, i32 0, i32 0), i32 %c11)
+  %d = alloca i32
+  store i32 12, i32* %d
+  %e = alloca i32
+  store i32 2, i32* %e
+  %d13 = load i32, i32* %d
+  %e14 = load i32, i32* %e
+  %normal_binop = sdiv i32 %d13, %e14
+  store i32 %normal_binop, i32* %e
+  %e15 = load i32, i32* %e
+  %printf16 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.29, i32 0, i32 0), i32 %e15)
+  %f = alloca i32
+  store i32 1, i32* %f
+  %f17 = load i32, i32* %f
+  %printf18 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.34, i32 0, i32 0), i32 %f17)
   ret i32 0
 }
