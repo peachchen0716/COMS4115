@@ -1,6 +1,7 @@
 .PHONY: clean
 
 OCB = ocamlbuild
+LLVM = -pkgs llvm
 
 clean:
 	$(OCB) -clean
@@ -11,3 +12,6 @@ test1:
 
 test2:
 	$(OCB) test2.native
+
+pyni:
+	$(OCB) $(LLVM) pyni.native
