@@ -12,7 +12,7 @@ and sx =
   | SListLit of typ * sexpr list
   | SListAccess of typ * string * sexpr
   | SListSlice of sexpr * sexpr * sexpr
-  | SLen of string
+  | SLen of typ * string
   | SListPop of sexpr * sexpr
   | SUniop of sexpr * op
   | SBinop of sexpr * op * sexpr
@@ -61,8 +61,7 @@ and string_of_sexpr (t, e) =
       | SListAccess(t, s, e2) -> string_of_typ t ^ " " ^ s ^ "[" ^ string_of_sexpr e2 ^ "]"
       | SListSlice(e1, e2, e3) -> 
         string_of_sexpr e1 ^ "[" ^ string_of_sexpr e2 ^ " : " ^ string_of_sexpr e3 ^ "]"
-
-      | SLen(s) -> "len(" ^ s ^ ")"
+      | SLen(t, s) -> string_of_typ t ^ " len(" ^ s ^ ")"
       | SListPop(e1, e2) -> "pop index " ^ string_of_sexpr e2 ^ " of " ^ string_of_sexpr e1
       | SUniop(e, o) -> string_of_sexpr e ^ " " ^ string_of_op o
       | SBinop(e1, o, e2) ->

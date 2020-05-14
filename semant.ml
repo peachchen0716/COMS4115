@@ -140,7 +140,7 @@ let check (global_stmts, functions) =
       let t = type_of_identifier s symbols in
       let err = "illegal len on type " ^ string_of_typ t in
       (match t with
-        List _ | String -> (Int, SLen s)
+        List _ | String -> (Int, SLen(t, s))
       | _ -> raise (Failure err))
     (* e1 must be list type, e2 must be int type *)
     | ListPop(e1, e2) -> 
