@@ -1,0 +1,9 @@
+int a = 1 + 2;
+print(a);
+a++;
+print(a);
+a--;
+print(a);
+
+int b = -10 + 5;
+print(b);

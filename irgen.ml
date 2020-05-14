@@ -21,7 +21,9 @@ let translate (stmts, functions) =
         TODO: dict
     *)
     let i32_t     = L.i32_type context
+    (*
     and i8_t      = L.i8_type context
+    *)
     and i1_t      = L.i1_type context
     and float_t   = L.double_type context
     and none_t    = L.void_type   context
@@ -71,12 +73,16 @@ let translate (stmts, functions) =
         | SBoolLit b -> L.const_int i1_t (if b then 1 else 0)
         | SFLit f    -> L.const_float float_t f
         | SStrLit s  -> L.build_global_stringptr (s^"\x00") "strptr" builder
+        | SListLit (t, sl) -> raise (Failure "not implemented")
+        | SListAccess (se1, se2)  -> raise (Failure "not implemented")
+        | SListSlice (se1, se2, se3) -> raise (Failure "not implemented")
+        | SLen s     -> raise (Failure "not implemented")
+        | SListPop (se1, se2) -> raise (Failure "not implemented")
         | SNoexpr    -> L.const_int i1_t 0
         | SId s      -> L.build_load (lookup s) s builder
         | SAssign (s, se) -> 
             let e' = build_expr builder glo_table loc_table se in 
             ignore(L.build_store e' (lookup s) builder); e'
-
         | SUniop (se, op) -> 
             let e' = build_expr builder glo_table loc_table se 
             and one = L.const_int i32_t 1 in
@@ -97,7 +103,8 @@ let translate (stmts, functions) =
                 in 
                 let old_ptr = lookup var_name in 
                 let _ = L.build_store tmp old_ptr builder in tmp
-              | A.Not   -> L.build_not e' "uniop" builder)          
+              | A.Not   -> L.build_not e' "uniop" builder          
+              | _       -> raise (Failure ("invalid Uniop " ^ A.string_of_op op)))
         | SBinop (se1, op, se2) ->
             let match_fop op = match op with 
                   A.Add      -> L.build_fadd 
@@ -134,8 +141,10 @@ let translate (stmts, functions) =
                     | A.Neq     -> L.build_icmp L.Icmp.Ne
                     | A.Less    -> L.build_icmp L.Icmp.Slt
                     | A.Greater -> L.build_icmp L.Icmp.Sgt
-                    | A.GreaterEq     -> L.build_icmp L.Icmp.Sge                 
-                    | A.LessEq     -> L.build_icmp L.Icmp.Sle
+                    | A.GreaterEq  
+                                -> L.build_icmp L.Icmp.Sge                 
+                    | A.LessEq  -> L.build_icmp L.Icmp.Sle
+                    | _         -> raise (Failure ("invalid Binop " ^ A.string_of_op op))
                 ) e1' e2' "normal_binop" builder
         | SCall ("print", [e]) ->
             L.build_call printf_func [| int_format_str ; (build_expr builder glo_table loc_table e)|]
@@ -212,6 +221,10 @@ let translate (stmts, functions) =
             let end_bb = L.append_block context "while_end" func_block in 
             ignore(L.build_cond_br bool_val body_bb end_bb while_builder);
             ((L.builder_at_end context end_bb), glo_table, loc_table)
+        | SListAppend (se1, se2) -> raise (Failure "not implemented")
+        | SListInsert (se1, se2, se3) -> raise (Failure "not implemented")
+        | SListSort (se) -> raise (Failure "not implemented")
+        | SListReverse (se) -> raise (Failure "not implemented")
     in
 
     (* build the main block of pyni *)
