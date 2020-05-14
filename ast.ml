@@ -18,7 +18,7 @@ type expr =
   | ListSlice of expr * expr * expr
   (* TODO: change to Len of expr if time allows *)
   | Len of string 
-  | ListPop of expr * expr
+  | ListPop of string
   | Uniop of expr * op
   | Binop of expr * op * expr
   | Assign of string * expr
@@ -35,7 +35,7 @@ type stmt =
   | BindAssign of typ * string * expr 
   | Return of expr
   (* append e2 to list e1 *)
-  | ListAppend of expr * expr
+  | ListAppend of string * expr
   (* insert e3 to list e1 at index e2 *)
   | ListInsert of expr * expr * expr
   | ListSort of expr
@@ -98,7 +98,7 @@ and string_of_expr = function
   | ListSlice(e1, e2, e3) -> string_of_expr e1 ^ "[" ^ string_of_expr e2 ^
                              " : " ^ string_of_expr e3 ^ "]"
   | Len(s) -> "len(" ^ s ^ ")"
-  | ListPop(e1, e2) -> "pop index " ^ string_of_expr e2 ^ " of " ^ string_of_expr e2 
+  | ListPop(s) -> "pop" 
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Uniop(e, o) -> string_of_expr e ^ " " ^ string_of_op o
@@ -121,7 +121,7 @@ let rec string_of_stmt = function
                           string_of_stmt s
   | BindAssign(t, v, e) -> string_of_typ t ^ " " ^ v ^ " = " ^
                            string_of_expr e ^ "\n"
-  | ListAppend(e1, e2) -> "append"
+  | ListAppend(s, e) -> "append"
   | ListInsert(e1, e2, e3) -> "insert"
   | ListSort(e) -> "sort"
   | ListReverse(e) -> "reverse"
