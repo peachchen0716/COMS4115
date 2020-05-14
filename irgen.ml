@@ -134,8 +134,8 @@ let translate (stmts, functions) =
                     | A.Neq     -> L.build_icmp L.Icmp.Ne
                     | A.Less    -> L.build_icmp L.Icmp.Slt
                     | A.Greater -> L.build_icmp L.Icmp.Sgt
-                    | A.GreaterEq     -> L.build_icmp L.Icmp.Sle                 
-                    | A.LessEq     -> L.build_icmp L.Icmp.Sge
+                    | A.GreaterEq     -> L.build_icmp L.Icmp.Sge                 
+                    | A.LessEq     -> L.build_icmp L.Icmp.Sle
                 ) e1' e2' "normal_binop" builder
         | SCall ("print", [e]) ->
             L.build_call printf_func [| int_format_str ; (build_expr builder glo_table loc_table e)|]
