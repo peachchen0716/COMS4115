@@ -181,7 +181,7 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test-*.pn tests/fail-*.pn"
+    files="tests/test-*.pn"
 fi
 
 for file in $files
@@ -190,7 +190,7 @@ do
 	*test-*)
 	    Check $file 2>> $globallog
 	    ;;
-	*fail-*)
+	*failed-*)
 	    CheckFail $file 2>> $globallog
 	    ;;
 	*)
