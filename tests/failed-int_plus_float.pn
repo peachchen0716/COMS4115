@@ -1,0 +1,5 @@
+def foo(int x, float y): float {
+	return x + y;
+}
+
+foo(3, 3.0);

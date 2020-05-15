@@ -1,0 +1,89 @@
+# equal on int and float ****************
+bool t = (1 == 1);
+bool t2 = (1.0 == 1.0);
+
+if (t and t2){
+	print(1);
+}
+else{
+	print(0);
+}
+
+# not equal on int and float ****************
+bool f = (1 != 2);
+bool f1 = (1.0 != 2.0);
+
+if (f and f1){
+	print(1);
+}
+else{
+	print(0);
+}
+
+# not on bool *******************************
+t = !t;
+
+if (!t){
+	print(1);
+}
+else{
+	print(0);
+}
+
+# less on int and float **********************
+t2 = (1 < 5);
+bool t3 = (1.0 < 5.0);
+
+if (t2 and t3){
+	print(1);
+}
+else{
+	print(0);
+}
+
+# greater on int and float *******************
+bool t4 = (5 > 1);
+bool t5 = (5.0 > 1.0);
+
+if (t4 and t5){
+	print(1);
+}
+else{
+	print(0);
+}
+
+# less than or equal to on int and float ********
+bool t6 = (6 <= 8);
+bool t7 = (6.6 <= 8.8);
+
+if (t6 and t7){
+	print(1);
+}
+else{
+	print(0);
+}
+
+# greater than or equal to on int and float ********
+bool t8 = (8 >= 6);
+bool t9 = (8.8 >= 6.6);
+
+if (t8 and t9){
+	print(1);
+}
+else{
+	print(0);
+}
+
+# or ************************************************
+bool t10 = (6 < 8);
+bool f3 = (6 > 8);
+
+if (f3 or t10){
+	print(1);
+}
+else{
+	print(0);
+}
+
+
+

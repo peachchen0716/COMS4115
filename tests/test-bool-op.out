@@ -1,0 +1,504 @@
+; ModuleID = 'Pyni'
+source_filename = "Pyni"
+
+@fmt = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.1 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.2 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.3 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.4 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.5 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.6 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.7 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.8 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.9 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.10 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.11 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.12 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.13 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.14 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.15 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.16 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.17 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.18 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.19 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.20 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.21 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.22 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.23 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.24 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.25 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.26 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.27 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.28 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.29 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.30 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.31 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.32 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.33 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.34 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.35 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.36 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.37 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.38 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.39 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.40 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.41 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.42 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.43 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.44 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.45 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.46 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.47 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.48 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.49 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.50 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.51 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.52 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.53 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.54 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.55 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.56 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.57 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.58 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.59 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.60 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.61 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.62 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.63 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.64 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.65 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.66 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.67 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.68 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.69 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.70 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.71 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.72 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.73 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.74 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.75 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.76 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.77 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.78 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.79 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.80 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.81 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.82 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.83 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.84 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.85 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.86 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.87 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.88 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.89 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.90 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.91 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.92 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.93 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.94 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.95 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.96 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.97 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.98 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.99 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@fmt.100 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+
+declare i32 @printf(i8*, ...)
+
+define i1 @list_getbool({ i32*, i1* }* %0, i32 %1) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i1* }*
+  store { i32*, i1* }* %0, { i32*, i1* }** %list_ptr_alloc
+  %idx_alloc = alloca i32
+  store i32 %1, i32* %idx_alloc
+  %list_load = load { i32*, i1* }*, { i32*, i1* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i1* }, { i32*, i1* }* %list_load, i32 0, i32 1
+  %array_load = load i1*, i1** %list_array_ptr
+  %idx_load = load i32, i32* %idx_alloc
+  %list_arry_element_ptr = getelementptr i1, i1* %array_load, i32 %idx_load
+  %list_array_element_ptr = load i1, i1* %list_arry_element_ptr
+  ret i1 %list_array_element_ptr
+}
+
+define i32 @list_getint({ i32*, i32* }* %0, i32 %1) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i32* }*
+  store { i32*, i32* }* %0, { i32*, i32* }** %list_ptr_alloc
+  %idx_alloc = alloca i32
+  store i32 %1, i32* %idx_alloc
+  %list_load = load { i32*, i32* }*, { i32*, i32* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i32* }, { i32*, i32* }* %list_load, i32 0, i32 1
+  %array_load = load i32*, i32** %list_array_ptr
+  %idx_load = load i32, i32* %idx_alloc
+  %list_arry_element_ptr = getelementptr i32, i32* %array_load, i32 %idx_load
+  %list_array_element_ptr = load i32, i32* %list_arry_element_ptr
+  ret i32 %list_array_element_ptr
+}
+
+define double @list_getfloat({ i32*, double* }* %0, i32 %1) {
+entry:
+  %list_ptr_alloc = alloca { i32*, double* }*
+  store { i32*, double* }* %0, { i32*, double* }** %list_ptr_alloc
+  %idx_alloc = alloca i32
+  store i32 %1, i32* %idx_alloc
+  %list_load = load { i32*, double* }*, { i32*, double* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, double* }, { i32*, double* }* %list_load, i32 0, i32 1
+  %array_load = load double*, double** %list_array_ptr
+  %idx_load = load i32, i32* %idx_alloc
+  %list_arry_element_ptr = getelementptr double, double* %array_load, i32 %idx_load
+  %list_array_element_ptr = load double, double* %list_arry_element_ptr
+  ret double %list_array_element_ptr
+}
+
+define i8* @list_getstr({ i32*, i8** }* %0, i32 %1) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i8** }*
+  store { i32*, i8** }* %0, { i32*, i8** }** %list_ptr_alloc
+  %idx_alloc = alloca i32
+  store i32 %1, i32* %idx_alloc
+  %list_load = load { i32*, i8** }*, { i32*, i8** }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i8** }, { i32*, i8** }* %list_load, i32 0, i32 1
+  %array_load = load i8**, i8*** %list_array_ptr
+  %idx_load = load i32, i32* %idx_alloc
+  %list_arry_element_ptr = getelementptr i8*, i8** %array_load, i32 %idx_load
+  %list_array_element_ptr = load i8*, i8** %list_arry_element_ptr
+  ret i8* %list_array_element_ptr
+}
+
+define i32 @list_sizebool({ i32*, i1* }* %0) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i1* }*
+  store { i32*, i1* }* %0, { i32*, i1* }** %list_ptr_alloc
+  %list_load = load { i32*, i1* }*, { i32*, i1* }** %list_ptr_alloc
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i1* }, { i32*, i1* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  ret i32 %list_size
+}
+
+define i32 @list_sizeint({ i32*, i32* }* %0) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i32* }*
+  store { i32*, i32* }* %0, { i32*, i32* }** %list_ptr_alloc
+  %list_load = load { i32*, i32* }*, { i32*, i32* }** %list_ptr_alloc
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i32* }, { i32*, i32* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  ret i32 %list_size
+}
+
+define i32 @list_sizefloat({ i32*, double* }* %0) {
+entry:
+  %list_ptr_alloc = alloca { i32*, double* }*
+  store { i32*, double* }* %0, { i32*, double* }** %list_ptr_alloc
+  %list_load = load { i32*, double* }*, { i32*, double* }** %list_ptr_alloc
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, double* }, { i32*, double* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  ret i32 %list_size
+}
+
+define i32 @list_sizestr({ i32*, i8** }* %0) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i8** }*
+  store { i32*, i8** }* %0, { i32*, i8** }** %list_ptr_alloc
+  %list_load = load { i32*, i8** }*, { i32*, i8** }** %list_ptr_alloc
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i8** }, { i32*, i8** }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  ret i32 %list_size
+}
+
+define void @list_pushbool({ i32*, i1* }* %0, i1 %1) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i1* }*
+  store { i32*, i1* }* %0, { i32*, i1* }** %list_ptr_alloc
+  %val_alloc = alloca i1
+  store i1 %1, i1* %val_alloc
+  %list_load = load { i32*, i1* }*, { i32*, i1* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i1* }, { i32*, i1* }* %list_load, i32 0, i32 1
+  %list_array_load = load i1*, i1** %list_array_ptr
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i1* }, { i32*, i1* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  %list_arry_next_element_ptr = getelementptr i1, i1* %list_array_load, i32 %list_size
+  %inc_size = add i32 %list_size, 1
+  store i32 %inc_size, i32* %list_size_ptr
+  %val = load i1, i1* %val_alloc
+  store i1 %val, i1* %list_arry_next_element_ptr
+  ret void
+}
+
+define void @list_pushint({ i32*, i32* }* %0, i32 %1) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i32* }*
+  store { i32*, i32* }* %0, { i32*, i32* }** %list_ptr_alloc
+  %val_alloc = alloca i32
+  store i32 %1, i32* %val_alloc
+  %list_load = load { i32*, i32* }*, { i32*, i32* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i32* }, { i32*, i32* }* %list_load, i32 0, i32 1
+  %list_array_load = load i32*, i32** %list_array_ptr
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i32* }, { i32*, i32* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  %list_arry_next_element_ptr = getelementptr i32, i32* %list_array_load, i32 %list_size
+  %inc_size = add i32 %list_size, 1
+  store i32 %inc_size, i32* %list_size_ptr
+  %val = load i32, i32* %val_alloc
+  store i32 %val, i32* %list_arry_next_element_ptr
+  ret void
+}
+
+define void @list_pushfloat({ i32*, double* }* %0, double %1) {
+entry:
+  %list_ptr_alloc = alloca { i32*, double* }*
+  store { i32*, double* }* %0, { i32*, double* }** %list_ptr_alloc
+  %val_alloc = alloca double
+  store double %1, double* %val_alloc
+  %list_load = load { i32*, double* }*, { i32*, double* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, double* }, { i32*, double* }* %list_load, i32 0, i32 1
+  %list_array_load = load double*, double** %list_array_ptr
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, double* }, { i32*, double* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  %list_arry_next_element_ptr = getelementptr double, double* %list_array_load, i32 %list_size
+  %inc_size = add i32 %list_size, 1
+  store i32 %inc_size, i32* %list_size_ptr
+  %val = load double, double* %val_alloc
+  store double %val, double* %list_arry_next_element_ptr
+  ret void
+}
+
+define void @list_pushstr({ i32*, i8** }* %0, i8* %1) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i8** }*
+  store { i32*, i8** }* %0, { i32*, i8** }** %list_ptr_alloc
+  %val_alloc = alloca i8*
+  store i8* %1, i8** %val_alloc
+  %list_load = load { i32*, i8** }*, { i32*, i8** }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i8** }, { i32*, i8** }* %list_load, i32 0, i32 1
+  %list_array_load = load i8**, i8*** %list_array_ptr
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i8** }, { i32*, i8** }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  %list_arry_next_element_ptr = getelementptr i8*, i8** %list_array_load, i32 %list_size
+  %inc_size = add i32 %list_size, 1
+  store i32 %inc_size, i32* %list_size_ptr
+  %val = load i8*, i8** %val_alloc
+  store i8* %val, i8** %list_arry_next_element_ptr
+  ret void
+}
+
+define i1 @list_popbool({ i32*, i1* }* %0) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i1* }*
+  store { i32*, i1* }* %0, { i32*, i1* }** %list_ptr_alloc
+  %list_load = load { i32*, i1* }*, { i32*, i1* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i1* }, { i32*, i1* }* %list_load, i32 0, i32 1
+  %list_array_load = load i1*, i1** %list_array_ptr
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i1* }, { i32*, i1* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  %dec_size = sub i32 %list_size, 1
+  %list_arry_next_element_ptr = getelementptr i1, i1* %list_array_load, i32 %dec_size
+  %list_arry_next_element = load i1, i1* %list_arry_next_element_ptr
+  store i32 %dec_size, i32* %list_size_ptr
+  ret i1 %list_arry_next_element
+}
+
+define i32 @list_popint({ i32*, i32* }* %0) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i32* }*
+  store { i32*, i32* }* %0, { i32*, i32* }** %list_ptr_alloc
+  %list_load = load { i32*, i32* }*, { i32*, i32* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i32* }, { i32*, i32* }* %list_load, i32 0, i32 1
+  %list_array_load = load i32*, i32** %list_array_ptr
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i32* }, { i32*, i32* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  %dec_size = sub i32 %list_size, 1
+  %list_arry_next_element_ptr = getelementptr i32, i32* %list_array_load, i32 %dec_size
+  %list_arry_next_element = load i32, i32* %list_arry_next_element_ptr
+  store i32 %dec_size, i32* %list_size_ptr
+  ret i32 %list_arry_next_element
+}
+
+define double @list_popfloat({ i32*, double* }* %0) {
+entry:
+  %list_ptr_alloc = alloca { i32*, double* }*
+  store { i32*, double* }* %0, { i32*, double* }** %list_ptr_alloc
+  %list_load = load { i32*, double* }*, { i32*, double* }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, double* }, { i32*, double* }* %list_load, i32 0, i32 1
+  %list_array_load = load double*, double** %list_array_ptr
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, double* }, { i32*, double* }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  %dec_size = sub i32 %list_size, 1
+  %list_arry_next_element_ptr = getelementptr double, double* %list_array_load, i32 %dec_size
+  %list_arry_next_element = load double, double* %list_arry_next_element_ptr
+  store i32 %dec_size, i32* %list_size_ptr
+  ret double %list_arry_next_element
+}
+
+define i8* @list_popstr({ i32*, i8** }* %0) {
+entry:
+  %list_ptr_alloc = alloca { i32*, i8** }*
+  store { i32*, i8** }* %0, { i32*, i8** }** %list_ptr_alloc
+  %list_load = load { i32*, i8** }*, { i32*, i8** }** %list_ptr_alloc
+  %list_array_ptr = getelementptr inbounds { i32*, i8** }, { i32*, i8** }* %list_load, i32 0, i32 1
+  %list_array_load = load i8**, i8*** %list_array_ptr
+  %list_size_ptr_ptr = getelementptr inbounds { i32*, i8** }, { i32*, i8** }* %list_load, i32 0, i32 0
+  %list_size_ptr = load i32*, i32** %list_size_ptr_ptr
+  %list_size = load i32, i32* %list_size_ptr
+  %dec_size = sub i32 %list_size, 1
+  %list_arry_next_element_ptr = getelementptr i8*, i8** %list_array_load, i32 %dec_size
+  %list_arry_next_element = load i8*, i8** %list_arry_next_element_ptr
+  store i32 %dec_size, i32* %list_size_ptr
+  ret i8* %list_arry_next_element
+}
+
+define i32 @main() {
+entry:
+  %t = alloca i1
+  store i1 true, i1* %t
+  %t2 = alloca i1
+  store i1 true, i1* %t2
+  %t1 = load i1, i1* %t
+  %t22 = load i1, i1* %t2
+  %normal_binop = and i1 %t1, %t22
+  br i1 %normal_binop, label %then, label %else
+
+then:                                             ; preds = %entry
+  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.9, i32 0, i32 0), i32 1)
+  br label %end
+
+else:                                             ; preds = %entry
+  %printf3 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.11, i32 0, i32 0), i32 0)
+  br label %end
+
+end:                                              ; preds = %else, %then
+  %f = alloca i1
+  store i1 true, i1* %f
+  %f1 = alloca i1
+  store i1 true, i1* %f1
+  %f4 = load i1, i1* %f
+  %f15 = load i1, i1* %f1
+  %normal_binop6 = and i1 %f4, %f15
+  br i1 %normal_binop6, label %then7, label %else9
+
+then7:                                            ; preds = %end
+  %printf8 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.22, i32 0, i32 0), i32 1)
+  br label %end11
+
+else9:                                            ; preds = %end
+  %printf10 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.24, i32 0, i32 0), i32 0)
+  br label %end11
+
+end11:                                            ; preds = %else9, %then7
+  %t12 = load i1, i1* %t
+  %uniop = xor i1 %t12, true
+  store i1 %uniop, i1* %t
+  %t13 = load i1, i1* %t
+  %uniop14 = xor i1 %t13, true
+  br i1 %uniop14, label %then15, label %else17
+
+then15:                                           ; preds = %end11
+  %printf16 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.31, i32 0, i32 0), i32 1)
+  br label %end19
+
+else17:                                           ; preds = %end11
+  %printf18 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.33, i32 0, i32 0), i32 0)
+  br label %end19
+
+end19:                                            ; preds = %else17, %then15
+  store i1 true, i1* %t2
+  %t3 = alloca i1
+  store i1 true, i1* %t3
+  %t220 = load i1, i1* %t2
+  %t321 = load i1, i1* %t3
+  %normal_binop22 = and i1 %t220, %t321
+  br i1 %normal_binop22, label %then23, label %else25
+
+then23:                                           ; preds = %end19
+  %printf24 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.45, i32 0, i32 0), i32 1)
+  br label %end27
+
+else25:                                           ; preds = %end19
+  %printf26 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.47, i32 0, i32 0), i32 0)
+  br label %end27
+
+end27:                                            ; preds = %else25, %then23
+  %t4 = alloca i1
+  store i1 true, i1* %t4
+  %t5 = alloca i1
+  store i1 true, i1* %t5
+  %t428 = load i1, i1* %t4
+  %t529 = load i1, i1* %t5
+  %normal_binop30 = and i1 %t428, %t529
+  br i1 %normal_binop30, label %then31, label %else33
+
+then31:                                           ; preds = %end27
+  %printf32 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.58, i32 0, i32 0), i32 1)
+  br label %end35
+
+else33:                                           ; preds = %end27
+  %printf34 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.60, i32 0, i32 0), i32 0)
+  br label %end35
+
+end35:                                            ; preds = %else33, %then31
+  %t6 = alloca i1
+  store i1 true, i1* %t6
+  %t7 = alloca i1
+  store i1 true, i1* %t7
+  %t636 = load i1, i1* %t6
+  %t737 = load i1, i1* %t7
+  %normal_binop38 = and i1 %t636, %t737
+  br i1 %normal_binop38, label %then39, label %else41
+
+then39:                                           ; preds = %end35
+  %printf40 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.71, i32 0, i32 0), i32 1)
+  br label %end43
+
+else41:                                           ; preds = %end35
+  %printf42 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.73, i32 0, i32 0), i32 0)
+  br label %end43
+
+end43:                                            ; preds = %else41, %then39
+  %t8 = alloca i1
+  store i1 true, i1* %t8
+  %t9 = alloca i1
+  store i1 true, i1* %t9
+  %t844 = load i1, i1* %t8
+  %t945 = load i1, i1* %t9
+  %normal_binop46 = and i1 %t844, %t945
+  br i1 %normal_binop46, label %then47, label %else49
+
+then47:                                           ; preds = %end43
+  %printf48 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.84, i32 0, i32 0), i32 1)
+  br label %end51
+
+else49:                                           ; preds = %end43
+  %printf50 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.86, i32 0, i32 0), i32 0)
+  br label %end51
+
+end51:                                            ; preds = %else49, %then47
+  %t10 = alloca i1
+  store i1 true, i1* %t10
+  %f3 = alloca i1
+  store i1 false, i1* %f3
+  %f352 = load i1, i1* %f3
+  %t1053 = load i1, i1* %t10
+  %normal_binop54 = or i1 %f352, %t1053
+  br i1 %normal_binop54, label %then55, label %else57
+
+then55:                                           ; preds = %end51
+  %printf56 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.97, i32 0, i32 0), i32 1)
+  br label %end59
+
+else57:                                           ; preds = %end51
+  %printf58 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.99, i32 0, i32 0), i32 0)
+  br label %end59
+
+end59:                                            ; preds = %else57, %then55
+  ret i32 0
+}

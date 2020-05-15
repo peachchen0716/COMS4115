@@ -1,0 +1,5 @@
+# test print float
+# this should fail
+float b = 1.0;
+
+print(b);

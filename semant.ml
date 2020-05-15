@@ -119,12 +119,12 @@ let check (global_stmts, functions) =
     | ListLit lst -> 
       let (t, slst) = check_list lst symbols in 
       (List(t), SListLit(t, slst))
-    | ListAccess(e1, e2) ->
-      let (lt, _) as se1 = check_expr e1 symbols in
-      let (rt, _) as se2 = check_expr e2 symbols in
+    | ListAccess(lname, e) ->
+      let lt as se1 = type_of_identifier lname symbols in
+      let (rt, _) as se = check_expr e symbols in
       if rt <> Int then raise (Failure ("illegal list index of type " ^ string_of_typ rt))
       else (match lt with
-          List t -> (t, SListAccess(se1, se2))
+          List t -> (t, SListAccess(lt, lname, se))
         | _ -> raise (Failure ("illegal indexing of type " ^ string_of_typ lt)))
     | ListSlice(e1, e2, e3) ->  
       let (lt, _) as se1 = check_expr e1 symbols in
@@ -136,19 +136,18 @@ let check (global_stmts, functions) =
           List t -> (lt, SListSlice(se1, se2, se3))
         | _ -> raise (Failure ("illegal slicing of type " ^ string_of_typ lt)))
     
-    | Len(e) -> 
-      let (t, _) as se = check_expr e symbols in
+    | Len(s) -> 
+      let t = type_of_identifier s symbols in
       let err = "illegal len on type " ^ string_of_typ t in
       (match t with
-        List _ | String -> (Int, SLen se)
+        List _ | String -> (Int, SLen(t, s))
       | _ -> raise (Failure err))
     (* e1 must be list type, e2 must be int type *)
-    | ListPop(e1, e2) -> 
-      let (lt, _) as se1 = check_expr e1 symbols in
-      let (rt, _) as se2 = check_expr e2 symbols in
-      let err = "illegal list pop on " ^ string_of_expr e1 ^ " at index " ^ string_of_expr e2 in
+    | ListPop(s) -> 
+      let lt = type_of_identifier s symbols in
+      let err = "illegal list pop on type " ^ string_of_typ lt in
       (match lt with
-        List t when rt = Int -> (t, SListPop(se1, se2))
+        List t -> (t, SListPop(lt, s))
       | _ -> raise (Failure err))
     | Assign(var, e) as ex ->
       let lt = type_of_identifier var symbols
@@ -288,12 +287,12 @@ let check (global_stmts, functions) =
       else raise (
           Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                    string_of_typ rtyp ^ " in " ^ string_of_expr e))
-    | ListAppend(e1, e2) ->
-      let (lt, _) as se1 = check_expr e1 symbols in
-      let (rt, _) as se2 = check_expr e2 symbols in
-      let err = "illegal append of type " ^ string_of_typ rt ^ "to " ^ string_of_typ lt in
+    | ListAppend(s, e) ->
+      let lt = type_of_identifier s symbols in
+      let (rt, _) as se = check_expr e symbols in
+      let err = "illegal list append of type " ^ string_of_typ rt ^ "to " ^ string_of_typ lt in
       (match lt with
-        List t when rt = t -> ( SListAppend(se1, se2), symbols )
+        List t when rt = t -> ( SListAppend(s, se), symbols )
       | _ -> raise (Failure err))
     | ListInsert(e1, e2, e3) ->
       let (lt, _) as se1 = check_expr e1 symbols in

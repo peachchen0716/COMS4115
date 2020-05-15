@@ -10,10 +10,10 @@ and sx =
   | SStrLit of string
   | SId of string
   | SListLit of typ * sexpr list
-  | SListAccess of sexpr * sexpr
+  | SListAccess of typ * string * sexpr
   | SListSlice of sexpr * sexpr * sexpr
-  | SLen of sexpr
-  | SListPop of sexpr * sexpr
+  | SLen of typ * string
+  | SListPop of typ * string 
   | SUniop of sexpr * op
   | SBinop of sexpr * op * sexpr
   | SAssign of string * sexpr
@@ -28,7 +28,7 @@ type sstmt =
   | SFor of sstmt * sexpr * sexpr * sstmt
   | SBindAssign of typ * string * sexpr
   | SReturn of sexpr
-  | SListAppend of sexpr * sexpr
+  | SListAppend of string * sexpr
   | SListInsert of sexpr * sexpr * sexpr
   | SListSort of sexpr
   | SListReverse of sexpr
@@ -38,7 +38,6 @@ type sfunc_def = {
   srtyp: typ;
   sfname: string;
   sformals: bind list;
-  (* slocals: bind list; *)
   sbody: sstmt list;
 }
 
@@ -59,12 +58,11 @@ and string_of_sexpr (t, e) =
       | SStrLit(s) -> s
       | SId(s) -> s
       | SListLit(_, lst) -> "[ " ^ string_of_slist lst ^ " ]"
-      | SListAccess(e1, e2) -> string_of_sexpr e1 ^ "[" ^ string_of_sexpr e2 ^ "]"
+      | SListAccess(t, s, e2) -> string_of_typ t ^ " " ^ s ^ "[" ^ string_of_sexpr e2 ^ "]"
       | SListSlice(e1, e2, e3) -> 
         string_of_sexpr e1 ^ "[" ^ string_of_sexpr e2 ^ " : " ^ string_of_sexpr e3 ^ "]"
-
-      | SLen(e) -> "len(" ^ string_of_sexpr e ^ ")"
-      | SListPop(e1, e2) -> "pop index " ^ string_of_sexpr e2 ^ " of " ^ string_of_sexpr e1
+      | SLen(t, s) -> " len(" ^ s ^ ")"
+      | SListPop(t, s) -> "pop"
       | SUniop(e, o) -> string_of_sexpr e ^ " " ^ string_of_op o
       | SBinop(e1, o, e2) ->
         string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
@@ -88,7 +86,7 @@ let rec string_of_sstmt = function
   | SBindAssign(t, v, e) -> string_of_typ t ^ " " ^ v ^ " = " ^
                             string_of_sexpr e ^ "\n"
   | SWhile(e, s) -> "while (" ^ string_of_sexpr e ^ ") " ^ string_of_sstmt s
-  | SListAppend(e1, e2) -> "append"
+  | SListAppend(s, e) -> "append"
   | SListInsert(e1, e2, e3) -> "insert"
   | SListSort(e) -> "sort"
   | SListReverse(e) -> "reverse"
